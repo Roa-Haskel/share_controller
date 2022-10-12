@@ -9,6 +9,6 @@ class Server:
     hosts.remove(ip)
     target=(hosts[0],8989)
     def send(self,data:str):
-        self.server.send(data.encode())
+        self.server.sendto(data.encode(),self.target)
     def recv(self):
         return self.server.recv(10240).decode()
