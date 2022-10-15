@@ -13,5 +13,5 @@ class Server:
     def send(self,data:str):
         self.server.sendto(data.encode(),self.target)
     def recv(self):
-        data,ipport=self.server.recvfrom(10240).decode()
+        data,ipport=self.server.recvfrom(10240)
         return data.encode()
