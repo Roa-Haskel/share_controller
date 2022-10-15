@@ -21,12 +21,51 @@ class AbsServer:
         self.target=('0.0.0.0',self.PORT)
 
     def sendTo(self,data:str):
+        if not isinstance(data,bytes):
+            data=str(data).encode()
         self.__server.sendto(data,self.target)
-    def recv(self,black:bool=True):
-        if not black:
-            try:
-                return self.__server.recvfrom(1024,0x40)
-            except:
-                return '',''
-        else:
-            return self.__server.recvfrom(1024)
+    def recvfrom(self):
+        return self.__server.recvfrom(1024)
+
+
+class CommonServer(AbsServer):
+    MSAGE_SEP=bytes(bytearray([i+10 for i in 'common_server_msage_sep'.encode()]))
+
+    @classmethod
+    class msageList:
+        def __init__(self):
+            self.msageContainer = []
+
+        def putMsage(self,dataTuple:tuple):
+
+            dataTuple(0).split()
+            self.msageContainer.append(dataTuple)
+
+    def __init__(self):
+        self.msageContainer=[]
+
+
+
+    def msageParaser(self,dataTuple:tuple):
+        msageType, message = dataTuple[0].split(self.MSAGE_SEP)
+        msageType = int(msageType)
+        return msageType,message,dataTuple[1]
+
+    def getMsage(self,inputMsageType:int):
+        for index in range(len(self.msageContainer)):
+            msgType,msage,addr=self.msageContainer[index]
+            if msgType==inputMsageType:
+                del self.msageContainer[index]
+                return msage,addr
+
+        while True:
+            msgType,msage,addr=self.msageParaser(self.recvfrom())
+            if msgType==inputMsageType:
+                return msage,addr
+            self.msageContainer.append((msgType,msage,addr))
+
+    def sendMsage(self,msgType:int,data:str):
+        data=str(msgType).encode()+self.MSAGE_SEP+data
+        super().sendTo(data)
+
+
