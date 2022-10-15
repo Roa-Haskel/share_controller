@@ -20,9 +20,7 @@ class AbsServer:
     def __init__(self):
         self.target=('0.0.0.0',self.PORT)
 
-    def sendTo(self,data:str):
-        if not isinstance(data,bytes):
-            data=str(data).encode()
+    def sendTo(self,data:bytes):
         self.__server.sendto(data,self.target)
     def recvfrom(self):
         return self.__server.recvfrom(1024)
@@ -34,6 +32,8 @@ class CommonServer(AbsServer):
     @classmethod
     class msageList:
         def __init__(self):
+            super().__init__()
+
             self.msageContainer = []
 
         def putMsage(self,dataTuple:tuple):
@@ -65,6 +65,8 @@ class CommonServer(AbsServer):
             self.msageContainer.append((msgType,msage,addr))
 
     def sendMsage(self,msgType:int,data:str):
+        if not isinstance(data,bytes):
+            data=str(data).encode()
         data=str(msgType).encode()+self.MSAGE_SEP+data
         super().sendTo(data)
 
