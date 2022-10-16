@@ -1,7 +1,7 @@
 import socket
 import requests
 import urllib
-from common import StagingSet
+from common import ClientsSet
 import time
 import threading
 
@@ -27,10 +27,12 @@ class AbsServer:
         url=urllib.parse.urljoin(self.remoteServerBaseUrl,'register/'+str(self.getLocalAddr()))
         htm=requests.get(url)
         return not htm.text
-    def logout(self):
-        url=urllib.parse.urljoin(self.remoteServerBaseUrl,'register/'+str(self.getLocalAddr()))
+    def deleteFromRemote(self,lanAddr:tuple):
+        url=urllib.parse.urljoin(self.remoteServerBaseUrl,'register/'+str(lanAddr))
         htm=requests.get(url)
         return not htm.text
+    def logout(self):
+        self.deleteFromRemote(self.getLocalAddr())
     def sendTo(self,data:bytes,target:tuple):
         self.__server.sendto(data,target)
     def recvfrom(self):
@@ -43,9 +45,9 @@ class CommonServer(AbsServer):
         super().__init__()
         self.register()
         self.msageContainer=[]
-        self.clients=[]
-        # threading.Thread(target=self.sendHeartbeat).start()
-        # threading.Thread(target=self.updateClients).start()
+        self.clients=ClientsSet()
+        threading.Thread(target=self.updateClients).start()
+        threading.Thread(target=self.sendHeartbeat).start()
 
     def updateClients(self):
         index=0
@@ -55,20 +57,16 @@ class CommonServer(AbsServer):
             self.chickHeartbeat()
             time.sleep(1)
             index+=1
-
     def getClientsFromRemote(self):
         url=urllib.parse.urljoin(self.remoteServerBaseUrl,'clients')
         htm=requests.get(url)
-        clients=eval(htm.text)
         localAddr=self.getLocalAddr()
-        if localAddr in clients:
-            clients.remove(localAddr)
-        self.clients=StagingSet(clients)
+        clients=[i for i in eval(htm.text) if i[0]!=localAddr[0]]
+        self.clients.update(clients)
 
     def chickHeartbeat(self):
         _,addr = self.getMsage(self.HEART_TYPE_LOGO)
         self.clients.add(addr)
-        time.sleep(1)
 
     def sendHeartbeat(self):
         while True:

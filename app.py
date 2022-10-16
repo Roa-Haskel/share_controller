@@ -1,7 +1,7 @@
 import flask
 from flask import request
 import re
-
+from common import StagingSet
 
 app=flask.Flask(__name__)
 
@@ -26,11 +26,10 @@ def register(lanAddr):
     data=eval(lanAddr)
     ip=request.remote_addr
     if  ip in clientMap and data not in clientMap[ip]:
-        clientMap[ip].append(data)
-        if len(clientMap[ip])>3:
-            del clientMap[ip][0]
+        if len(clientMap[ip])<10:
+            clientMap[ip].add(data)
     elif ip not in clientMap and len(clientMap)<100:
-        clientMap[ip]=[data]
+        clientMap[ip]=StagingSet([data])
     return ''
 
 @app.route("/delete/<lanAddr>")
@@ -41,7 +40,7 @@ def delete(lanAddr):
     ip = request.remote_addr
     if ip in clientMap:
         if data in clientMap[ip]:
-            clientMap[ip].remove(data)
+            clientMap[ip].safeRemove(data)
     return ''
 
 @app.route('/clients')
