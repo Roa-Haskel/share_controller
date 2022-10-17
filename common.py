@@ -22,6 +22,10 @@ class StagingSet(set):
                 for i in removed:
                     self.remove(i)
             time.sleep(1)
+    def add(self, element) -> None:
+        super().add(element)
+        self.timer[element]=self.timeout
+
     def remove(self, element) -> None:
         if element in self.timer:
             self.timer.pop(element)
