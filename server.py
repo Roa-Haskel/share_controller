@@ -7,6 +7,7 @@ import threading
 
 
 class AbsServer:
+
     PORT=19999
     remoteServerBaseUrl="http://120.48.68.8"
 
@@ -98,3 +99,5 @@ class CommonServer(AbsServer):
         data=str(msgType).encode()+self.MSAGE_SEP+data
         super().sendTo(data,target)
 
+if __name__ == '__main__':
+    i = 100
