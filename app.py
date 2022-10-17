@@ -29,7 +29,7 @@ def register(lanAddr):
         if len(clientMap[ip])<10:
             clientMap[ip].add(data)
     elif ip not in clientMap and len(clientMap)<100:
-        clientMap[ip]=StagingSet([data])
+        clientMap[ip]=StagingSet([data],20)
     return ''
 
 @app.route("/delete/<lanAddr>")

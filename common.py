@@ -35,7 +35,7 @@ class StagingSet(set):
         self.__destroyed=True
 
 
-class ClientsSet(StagingSet):
+class RemoveCallbackSet(StagingSet):
     def __init__(self,iterable,timeout=10,removeCallback:'function'=None):
         super().__init__(iterable,timeout)
         self.removeCallback=removeCallback

@@ -1,7 +1,7 @@
 import socket
 import requests
 import urllib
-from common import ClientsSet
+from common import RemoveCallbackSet
 import time
 import threading
 
@@ -26,7 +26,11 @@ class AbsServer:
         self.__server.bind(self.getLocalAddr())
     def register(self):
         url=urllib.parse.urljoin(self.remoteServerBaseUrl,'register/'+str(self.getLocalAddr()))
-        htm=requests.get(url)
+        try:
+            htm=requests.get(url)
+            htm.raise_for_status()
+        except:
+            return False
         return not htm.text
     def deleteFromRemote(self,lanAddr:tuple):
         url=urllib.parse.urljoin(self.remoteServerBaseUrl,'register/'+str(lanAddr))
@@ -46,10 +50,14 @@ class CommonServer(AbsServer):
         super().__init__()
         self.register()
         self.msageContainer=[]
-        self.clients=ClientsSet([])
+        self.clients=RemoveCallbackSet([])
         threading.Thread(target=self.updateClients).start()
         threading.Thread(target=self.sendHeartbeat).start()
-
+        threading.Thread(target=self.registerLoop).start()
+    def registerLoop(self):
+        while True:
+            if self.register():
+                time.sleep(16)
     def updateClients(self):
         index=0
         while True:
