@@ -1,7 +1,7 @@
 import pystray
 from PIL import Image
 
-image=Image.open('/Users/roahaskel/Pictures/img.png')
+image=Image.open('../resources/icon/img.png')
 
 def onClick(ico,item):
     print(item)
