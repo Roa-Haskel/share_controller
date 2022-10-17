@@ -46,7 +46,7 @@ def delete(lanAddr):
 @app.route('/clients')
 def getClients():
     ip=request.remote_addr
-    return str(clientMap[ip]) if ip in clientMap else str(set())
+    return str(list(clientMap[ip])) if ip in clientMap else str(set())
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=80)

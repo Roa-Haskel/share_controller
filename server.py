@@ -46,7 +46,7 @@ class CommonServer(AbsServer):
         super().__init__()
         self.register()
         self.msageContainer=[]
-        self.clients=ClientsSet()
+        self.clients=ClientsSet([])
         threading.Thread(target=self.updateClients).start()
         threading.Thread(target=self.sendHeartbeat).start()
 
