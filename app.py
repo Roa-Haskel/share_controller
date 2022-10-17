@@ -25,9 +25,8 @@ def register(lanAddr):
         return 'lanaddr error'
     data=eval(lanAddr)
     ip=request.remote_addr
-    if  ip in clientMap and data not in clientMap[ip]:
-        if len(clientMap[ip])<10:
-            clientMap[ip].add(data)
+    if  ip in clientMap and len(clientMap[ip])<10:
+        clientMap[ip].add(data)
     elif ip not in clientMap and len(clientMap)<100:
         clientMap[ip]=StagingSet([data],20)
     return ''

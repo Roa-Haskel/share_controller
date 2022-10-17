@@ -9,7 +9,8 @@ import threading
 class AbsServer:
 
     PORT=19999
-    remoteServerBaseUrl="http://120.48.68.8"
+    # remoteServerBaseUrl="http://120.48.68.8"
+    remoteServerBaseUrl="http://127.0.0.1"
 
     __localAddr=None
     @classmethod
