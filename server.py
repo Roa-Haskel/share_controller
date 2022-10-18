@@ -1,8 +1,7 @@
 import socket
 import requests
 import urllib
-from common import RemoveCallbackSet
-import time
+from common import RemoveCallbackSet,methodForLoop
 import threading
 
 
@@ -52,37 +51,44 @@ class CommonServer(AbsServer):
         self.register()
         self.msageContainer=[]
         self.clients=RemoveCallbackSet([])
-        threading.Thread(target=self.updateClients).start()
-        threading.Thread(target=self.sendHeartbeat).start()
-        threading.Thread(target=self.registerLoop).start()
-    def registerLoop(self):
-        while True:
-            if self.register():
-                time.sleep(16)
-    def updateClients(self):
-        index=0
-        while True:
-            if index%10==0:
-                self.getClientsFromRemote()
-            self.chickHeartbeat()
-            time.sleep(1)
-            index+=1
-    def getClientsFromRemote(self):
-        url=urllib.parse.urljoin(self.remoteServerBaseUrl,'clients')
-        htm=requests.get(url)
-        localAddr=self.getLocalAddr()
-        clients=[i for i in eval(htm.text) if i[0]!=localAddr[0]]
-        self.clients.update(clients)
 
+        for method in [
+            self.registerLoop
+            ,self.updateClientsFromRemote
+            ,self.sendHeartbeat
+            ,self.chickHeartbeat
+        ]:
+            threading.Thread(target=method).start()
+
+    @methodForLoop(16,4)
+    def registerLoop(self):
+        print('register success' if self.register() else "register failed")
+
+    @methodForLoop(11,2)
+    def updateClientsFromRemote(self):
+        print("update clients")
+        url=urllib.parse.urljoin(self.remoteServerBaseUrl,'clients')
+        try:
+            clients=eval(requests.get(url,timeout=5).text)
+            clients=[i for i in clients if i!=self.getLocalAddr()]
+        except:
+            clients=[]
+        print("remote clients:%s"%str(clients))
+        if clients:
+            self.clients.update(*clients)
+
+    @methodForLoop(0)
     def chickHeartbeat(self):
+        print("chick heart beat")
         _,addr = self.getMsage(self.HEART_TYPE_LOGO)
+        print('get heart beat from %s'%str(addr))
         self.clients.add(addr)
 
+    @methodForLoop(7,3)
     def sendHeartbeat(self):
-        while True:
-            for i in self.clients:
-                self.sendMsage('',i,self.HEART_TYPE_LOGO)
-            time.sleep(1)
+        for i in self.clients:
+            self.sendMsage('',i,self.HEART_TYPE_LOGO)
+            print('send heart beat to %s'%str(i))
 
     def msageParaser(self,dataTuple:tuple):
         msageType, message = dataTuple[0].split(self.MSAGE_SEP)
