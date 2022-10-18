@@ -40,7 +40,7 @@ class StagingSet(set):
             pass
     def update(self, *s) -> None:
         with self.__lock:
-            super().update(s)
+            super().update(*s)
     def destroy(self):
         self.__destroyed=True
 
