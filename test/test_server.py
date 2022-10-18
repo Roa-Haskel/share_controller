@@ -15,3 +15,9 @@ with pynput.mouse.Events() as events:
     for event in events:
         con.sendMsage((event.x-x,event.y-y),list(con.clients)[0],2)
         x,y=event.x,event.y
+
+
+
+
+if __name__ == '__main__':
+    pass
