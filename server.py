@@ -63,27 +63,32 @@ class CommonServer(AbsServer):
 
 class ManageServer(CommonServer):
 
-    def __int__(self,port):
+    def __int__(self,port=19999):
         super().__init__(port)
-        threading.Thread(target=self._chickHeatBeat).start()
-        self.__sendToAllLan()
         self.clients=RemoveCallbackSet([],13)
-    def __sendToAllLan(self):
-        ip=self.getLocalAddr()[0]
-        splitIp = ip.split(".")
-        topThree='.'.join(splitIp[:-1])
-        allIps=[topThree+"."+str(i) for i in range(1,255) if str(i)!=splitIp[-1]]
-        for i in allIps:
-            try:
-                self.sendMsage('', (i,self._port), self.HEART_TYPE_LOGO)
-            except:
-                print(i,self._port,'error')
+        for method in [self._chickHeatBeat,self._sendHeatBeat,self._sendToAllLan]:
+            threading.Thread(target=method).start()
 
-    @methodForLoop(6, 3)
+    @methodForLoop(50,10)
+    def _sendToAllLan(self):
+        ip=self.getLocalAddr()[0]
+        while not self.clients:
+            splitIp = ip.split(".")
+            topThree='.'.join(splitIp[:-1])
+            allIps=[topThree+"."+str(i) for i in range(1,255) if str(i)!=splitIp[-1]]
+            for i in allIps:
+                try:
+                    self.sendMsage('', (i,self._port), self.HEART_TYPE_LOGO)
+                except:
+                    print('send to %s error'%(str((ip,self._port))))
+    @methodForLoop(0)
     def _chickHeatBeat(self):
         _, addr = self.getMsage(self.HEART_TYPE_LOGO)
         self.clients.add(addr)
-
+    @methodForLoop(8,3)
+    def _sendHeatBeat(self):
+        for i in self.clients:
+            self.sendMsage('',i,self.HEART_TYPE_LOGO)
 class ControllerServer(CommonServer):
     pass
 
