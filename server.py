@@ -1,4 +1,6 @@
 import socket
+import threading
+
 from common import RemoveCallbackSet,methodForLoop
 
 class AbsServer:
@@ -6,7 +8,7 @@ class AbsServer:
         self._port=port
         self.__server=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__localAddr=None
-        self.__server.bind(self.getLocalAddr())
+        self.__server.bind(('0.0.0.0',self._port))
     def getLocalAddr(self):
         if not self.__localAddr:
             server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -23,28 +25,17 @@ class AbsServer:
 class CommonServer(AbsServer):
     MSAGE_SEP=bytes(bytearray([i+10 for i in 'common_server_msage_sep'.encode()]))
     HEART_TYPE_LOGO=-1111111
-    def __init__(self):
-        super().__init__()
+    def __init__(self,port):
+        super().__init__(port)
         self.__msageContainer=[]
-        self.__sendToAllLan()
-        self.clients=RemoveCallbackSet([],20,None)
     def recvfrom(self):
         while True:
             data,addr=super().recvfrom()
             if self.MSAGE_SEP in data:
                 return data,addr
-    def __sendToAllLan(self):
-        ip=self.getLocalAddr()[0]
-        splitIp = ip.split(".")
-        topThree='.'.join(splitIp[:-1])
-        allIps=[topThree+"."+str(i) for i in range(1,256) if str(i)!=splitIp[-1]]
-        for i in allIps:
-            self.sendMsage('', (i,self._port), self.HEART_TYPE_LOGO)
 
-    @methodForLoop(6,3)
-    def chickHeatBeat(self):
-        _,addr = self.getMsage(self.HEART_TYPE_LOGO)
-        self.clients.add(addr)
+
+
     def msageParaser(self,dataTuple:tuple):
         msageType, message = dataTuple[0].split(self.MSAGE_SEP)
         msageType = int(msageType)
@@ -69,6 +60,34 @@ class CommonServer(AbsServer):
             data=str(data).encode()
         data=str(msgType).encode()+self.MSAGE_SEP+data
         super().sendTo(data,target)
+
+class ManageServer(CommonServer):
+
+    def __int__(self,port):
+        super().__init__(port)
+        threading.Thread(target=self._chickHeatBeat).start()
+        self.__sendToAllLan()
+        self.clients=RemoveCallbackSet([],13)
+    def __sendToAllLan(self):
+        ip=self.getLocalAddr()[0]
+        splitIp = ip.split(".")
+        topThree='.'.join(splitIp[:-1])
+        allIps=[topThree+"."+str(i) for i in range(1,255) if str(i)!=splitIp[-1]]
+        for i in allIps:
+            try:
+                self.sendMsage('', (i,self._port), self.HEART_TYPE_LOGO)
+            except:
+                print(i,self._port,'error')
+
+    @methodForLoop(6, 3)
+    def _chickHeatBeat(self):
+        _, addr = self.getMsage(self.HEART_TYPE_LOGO)
+        self.clients.add(addr)
+
+class ControllerServer(CommonServer):
+    pass
+
+
 
 if __name__ == '__main__':
     i = 100
