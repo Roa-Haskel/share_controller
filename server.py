@@ -74,6 +74,7 @@ class ManageServer(CommonServer):
                 try:
                     self.sendMsage('', (i,self._port), self.MsageType.HEART_TYPE_LOGO)
                 except Exception as e:
+                    print(e)
                     print('send to %s error'%(str((i,self._port))))
                     pass
             time.sleep(1)
@@ -81,7 +82,7 @@ class ManageServer(CommonServer):
     def _sendHeatBeat(self):
         for i in self.clients:
             try:
-                self.sendMsage('',i,self.HEART_TYPE_LOGO)
+                self.sendMsage('',i,self.MsageType.HEART_TYPE_LOGO)
             except:
                 pass
     @methodForLoop(0)
