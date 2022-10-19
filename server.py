@@ -1,7 +1,8 @@
 import socket
 import threading
-
+import time
 from common import RemoveCallbackSet,methodForLoop
+
 
 class AbsServer:
     def __init__(self,port=19999):
@@ -78,17 +79,18 @@ class ManageServer(CommonServer):
             allIps=[topThree+"."+str(i) for i in range(1,255) if str(i)!=splitIp[-1]]
             for i in allIps:
                 try:
-                    self.sendMsage('', (i,self._port), self.HEART_TYPE_LOGO)
+                    self.sendMsage(self.getLocalAddr(), (i,self._port), self.HEART_TYPE_LOGO)
                 except:
                     print('send to %s error'%(str((ip,self._port))))
+            time.sleep(1)
     @methodForLoop(0)
     def _chickHeatBeat(self):
-        _, addr = self.getMsage(self.HEART_TYPE_LOGO)
-        self.clients.add(addr)
+        msg, addr = self.getMsage(self.HEART_TYPE_LOGO)
+        self.clients.add(eval(msg))
     @methodForLoop(8,3)
     def _sendHeatBeat(self):
         for i in self.clients:
-            self.sendMsage('',i,self.HEART_TYPE_LOGO)
+            self.sendMsage(self.getLocalAddr(),i,self.HEART_TYPE_LOGO)
 class ControllerServer(CommonServer):
     pass
 
