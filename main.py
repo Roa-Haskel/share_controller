@@ -20,7 +20,6 @@ def on_scroll(x, y, dx, dy):
 # Collect events until released
 with mouse.Listener(
         suppress=True,
-        xx=1000,
         on_move=on_move,
         on_click=on_click,
         on_scroll=on_scroll) as listener:

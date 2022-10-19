@@ -37,7 +37,7 @@ class ControlManageServer(CommonServer):
         while True:
             if index%30!=0:
                 continue
-            self.sendHeartToAllTargets(allIps)
+            # self.sendHeartToAllTargets(allIps)
             while not self.clients:
                 self.sendHeartToAllTargets(allIps)
                 time.sleep(3)
