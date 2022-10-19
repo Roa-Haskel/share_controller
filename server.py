@@ -63,7 +63,7 @@ class CommonServer(AbsServer):
 
 class ManageServer(CommonServer):
 
-    def __int__(self,port=19999):
+    def __init__(self,port=19999):
         super().__init__(port)
         self.clients=RemoveCallbackSet([],13)
         for method in [self._chickHeatBeat,self._sendHeatBeat,self._sendToAllLan]:
