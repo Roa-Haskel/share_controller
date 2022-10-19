@@ -38,7 +38,7 @@ class CommonServer(AbsServer):
         dataTuple=self.recvfrom()
         msageType, message,addr = dataTuple[0].split(self.MSAGE_SEP)
         msageType = int(msageType)
-        return msageType, message, addr
+        return msageType, message, eval(addr)
 
 
     def sendMsage(self,data:str,target:tuple,msgType:int=0):
@@ -74,7 +74,8 @@ class ManageServer(CommonServer):
                 try:
                     self.sendMsage('', (i,self._port), self.HEART_TYPE_LOGO)
                 except:
-                    print('send to %s error'%(str((ip,self._port))))
+                    # print('send to %s error'%(str((ip,self._port))))
+                    pass
             time.sleep(1)
     @methodForLoop(8,3)
     def _sendHeatBeat(self):
