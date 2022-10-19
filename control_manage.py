@@ -20,27 +20,35 @@ class ControlManageServer(CommonServer):
     def __init__(self,port=19999):
         super().__init__(port)
         self.mouse = pynput.mouse.Controller()
+        self.dx,self.dy=self.mouse.position
+
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
         self.clients=RemoveCallbackSet([],13)
-        for method in [self._eventMainLoop, self._sendHeatBeat, self._sendToAllLan]:
+        for method in [self._eventMainLoop, self._sendHeatBeat, self.scanLanLoop]:
             threading.Thread(target=method).start()
 
-    @methodForLoop(50,10)
-    def _sendToAllLan(self):
+    def scanLanLoop(self):
         ip=self.getLocalAddr()[0]
-        while not self.clients:
-            splitIp = ip.split(".")
-            topThree='.'.join(splitIp[:-1])
-            allIps=[topThree+"."+str(i) for i in range(1,255) if str(i)!=splitIp[-1]]
-            for i in allIps:
-                try:
-                    self.sendMsage('', (i,self._port), self.MsageType.HEART_TYPE_LOGO)
-                except Exception as e:
-                    print(e)
-                    print('send to %s error'%(str((i,self._port))))
-                    pass
+        splitIp = ip.split(".")
+        topThree = '.'.join(splitIp[:-1])
+        allIps = [topThree + "." + str(i) for i in range(1, 255) if str(i) != splitIp[-1]]
+        index=0
+        while True:
+            if index%30!=0:
+                continue
+            self.sendHeartToAllTargets(allIps)
+            while not self.clients:
+                self.sendHeartToAllTargets(allIps)
+                time.sleep(3)
             time.sleep(1)
+    def sendHeartToAllTargets(self,ips:list):
+        for i in ips:
+            try:
+                self.sendMsage('', (i, self._port), self.MsageType.HEART_TYPE_LOGO)
+            except Exception as e:
+                pass
+
     @methodForLoop(8,3)
     def _sendHeatBeat(self):
         for i in self.clients:
@@ -54,7 +62,7 @@ class ControlManageServer(CommonServer):
         if msgType == self.MsageType.HEART_TYPE_LOGO:
             self.clients.add(addr)
         elif msgType == self.MsageType.MOUSE_EVENTS:
-            self.mouseEvent(json.loads(msg))
+            self.mouseEvent(**json.loads(msg))
         elif msgType == self.MsageType.SCREEN_MANAGER_EVENTS:
             print("screen manage set------")
             pass
@@ -77,17 +85,19 @@ class ControlManageServer(CommonServer):
         elif kwargs['type']=='scroll':
             self.mouse.scroll(**kwargs['params'])
 
-    def sendEvent(self,data:dict):
-        self.sendMsage(json.dumps(data),self.target,self.MsageType.MOUSE_EVENTS)
+    def sendEvent(self,data:dict,eventType:int):
+        self.sendMsage(json.dumps(data),self.target,eventType)
     def onMove(self,x,y):
-        data={'type':'move','params':{'x':x,'y':y}}
-        self.sendMsage(data)
+        nx,ny=x-self.dx,y-self.dy
+        self.dx,self.dy=x,y
+        data={'type':'move','params':{'dx':nx,'dy':ny}}
+        self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
     def onClick(self,x, y, button, pressed):
         data={'type':'click','button':str(button).split(".")[-1],'pressed':pressed}
-        self.sendMsage(data)
+        self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
     def onScroll(self,x,y,dx,dy):
-        data={'type':'scroll','params':{'dx':dx,'dy':dy}}
-        self.sendMsage(data)
+        data={'type':'scroll','params':{'dx':dx*5,'dy':dy*5}}
+        self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
 
     def keyboardEvent(self,**kwargs):
         if kwargs['type']=='press':
