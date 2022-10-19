@@ -72,9 +72,9 @@ class ManageServer(CommonServer):
             allIps=[topThree+"."+str(i) for i in range(1,255) if str(i)!=splitIp[-1]]
             for i in allIps:
                 try:
-                    self.sendMsage('', (i,self._port), self.HEART_TYPE_LOGO)
-                except:
-                    # print('send to %s error'%(str((ip,self._port))))
+                    self.sendMsage('', (i,self._port), self.MsageType.HEART_TYPE_LOGO)
+                except Exception as e:
+                    print('send to %s error'%(str((i,self._port))))
                     pass
             time.sleep(1)
     @methodForLoop(8,3)
