@@ -17,11 +17,14 @@ class ControlManageServer(CommonServer):
         MOUSE_EVENTS=2324
         #屏幕管理器事件
         SCREEN_MANAGER_EVENTS=211
+        #控制器状态变更事件
+        CONTROL_STATUS_CHANGE=24234
     def __init__(self,port=19999):
         super().__init__(port)
         self.mouse = pynput.mouse.Controller()
         self.dx,self.dy=self.mouse.position
 
+        self.conrolled=True
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
         self.clients=RemoveCallbackSet([],13)
@@ -69,6 +72,8 @@ class ControlManageServer(CommonServer):
         elif msgType==self.MsageType.KEYBOARD_EVENTS:
             print("keyboard event")
             pass
+        elif msgType==self.MsageType.CONTROL_STATUS_CHANGE:
+            self.conrolled=eval(msg)
         else:
             print("unknow msage type %s"%msgType)
 
@@ -92,6 +97,8 @@ class ControlManageServer(CommonServer):
         self.dx,self.dy=x,y
         data={'type':'move','params':{'dx':nx,'dy':ny}}
         self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
+        if self.conrolled:
+            return False
     def onClick(self,x, y, button, pressed):
         data={'type':'click','button':str(button).split(".")[-1],'pressed':pressed}
         self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
@@ -121,6 +128,8 @@ class ControlManageServer(CommonServer):
             for event in events:
                 if isinstance(event,pynput.mouse.Events.Move):
                     if event.x<0:
+                        self.conrolled=False
+                        self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
                         break
         print('--------------------------')
         with pynput.mouse.Listener(
