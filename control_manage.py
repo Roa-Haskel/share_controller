@@ -3,9 +3,11 @@ import json
 import pynput
 import time
 from common import RemoveCallbackSet,methodForLoop
+from screen_manage import ScreenManage
 import threading
 
-class ControlManageServer(CommonServer):
+
+class ControlManageServer(CommonServer,ScreenManage):
     BUTTONS = {"left": pynput.mouse.Button.left, "right": pynput.mouse.Button.right,
                "middle": pynput.mouse.Button.middle}
     class MsageType:
@@ -17,13 +19,13 @@ class ControlManageServer(CommonServer):
         MOUSE_EVENTS=2324
         #屏幕管理器事件
         SCREEN_MANAGER_EVENTS=211
-        #控制器状态变更事件
+        #控制器状态变更事件，用于控制是否抑制当前输入，发送到其他屏幕
         CONTROL_STATUS_CHANGE=24234
     def __init__(self,port=19999):
-        super().__init__(port)
+        CommonServer.__init__(self,port)
+        ScreenManage.__init__(self,self.getLocalAddr())
         self.mouse = pynput.mouse.Controller()
         self.dx,self.dy=self.mouse.position
-
         self.conrolled=True
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
@@ -87,6 +89,11 @@ class ControlManageServer(CommonServer):
                 self.mouse.press(self.BUTTONS[button])
             else:
                 self.mouse.release(self.BUTTONS[button])
+        elif kwargs['type']=='move_to':
+            toX,toY=kwargs['params']['x'],kwargs['params']['y']
+            dx,dy=toX-self.mouse.position[0],toY-self.mouse.position[1]
+            self.mouse.move(dx,dy)
+
         elif kwargs['type']=='scroll':
             self.mouse.scroll(**kwargs['params'])
 
@@ -127,9 +134,15 @@ class ControlManageServer(CommonServer):
         with pynput.mouse.Events() as events:
             for event in events:
                 if isinstance(event,pynput.mouse.Events.Move):
-                    if event.x<0:
+
+                    x,y=event.x,event.y
+
+                    target,xy=self.coordinateIsInTarget(x,y)
+
+                    if target:
                         self.conrolled=False
                         self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
+                        self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}},self.MsageType.MOUSE_EVENTS)
                         break
         print('--------------------------')
         with pynput.mouse.Listener(

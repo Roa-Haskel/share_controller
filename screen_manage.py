@@ -3,6 +3,13 @@ import tkinter
 class ScreenManage:
     @staticmethod
     def isInscreen(screen:tuple,coordinate):
+        """
+        Args:
+            screen:((width,height),(top,left))
+            coordinate: (x,y)
+        Returns:
+            给定坐标是否在屏幕中
+        """
         ((width,height),leftTop)=screen
         return coordinate[0] > leftTop[0] and coordinate[0] < leftTop[0] + width \
                and coordinate[1] > leftTop[1] and coordinate[1] < leftTop[1] + height
@@ -31,7 +38,20 @@ class ScreenManage:
             for key,screen in self.screens.items():
                 ((w,h),(l,t))=screen
                 self.screens[key]=((w,h),(l-left,top-top))
+    def coordinateIsInTarget(self,x:int,y:int):
+        if not self.isInscreen(self.screens[self.selfAddr],(x,y)):
+            for target,screen in self.screens.items():
+                if self.isInscreen(screen,(x,y)):
+                    ((_,_),(left,top))=screen
+                    return target,(x-left,y-top)
+        return None,None
 
+    def setting(self):
+        """
+        打开gui设置窗口，可视化方式拖动各个窗口位置
+        Returns:
 
+        """
+        pass
 
 
