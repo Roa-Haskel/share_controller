@@ -150,14 +150,13 @@ class ControlManageServer(CommonServer,ScreenManage):
                         self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
                         self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}},self.MsageType.MOUSE_EVENTS)
                         break
-        if self.conrolled:
-            return
-        with pynput.mouse.Listener(
-                suppress=True,
-                on_move=self.onMove,
-                on_click=self.onClick,
-                on_scroll=self.onScroll) as listener:
-            listener.join()
+        if not self.conrolled:
+            with pynput.mouse.Listener(
+                    suppress=True,
+                    on_move=self.onMove,
+                    on_click=self.onClick,
+                    on_scroll=self.onScroll) as listener:
+                listener.join()
 
 
 if __name__ == '__main__':

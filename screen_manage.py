@@ -75,7 +75,6 @@ class ScreenManage:
             target,(x,y)
         """
         if not self.isInscreen(self.getScreen(),(x,y)):
-            print((x,y),self.getScreen())
             for target,screen in self.screens.items():
                 if target!=self.selfAddr and self.isInscreen(screen,(x,y)):
                     ((_,_),(left,top))=screen
