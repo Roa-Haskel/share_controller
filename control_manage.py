@@ -68,7 +68,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         msgType, msg, addr = self.getMsage()
         if msgType == self.MsageType.HEART_TYPE_LOGO:
             self.clients.add(addr)
-            if addr not in self.screens:
+            if str(addr) not in self.screens:
                 self.sendMsage(self.getScreenSize(),addr,self.MsageType.ADD_SCREEN_EVENTS)
         elif msgType==self.MsageType.ADD_SCREEN_EVENTS:
             self.addClient(addr,eval(msg))
@@ -135,14 +135,13 @@ class ControlManageServer(CommonServer,ScreenManage):
 
     def setTarget(self,target):
         self.target=target
-
+    @methodForLoop(0)
     def mainLoop(self):
         while not self.clients:
             time.sleep(3)
         with pynput.mouse.Events() as events:
             for event in events:
                 if isinstance(event,pynput.mouse.Events.Move):
-
                     x,y=event.x,event.y
                     target,xy=self.coordinateIsInTarget(x,y)
                     self.target=target
@@ -151,6 +150,8 @@ class ControlManageServer(CommonServer,ScreenManage):
                         self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
                         self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}},self.MsageType.MOUSE_EVENTS)
                         break
+        if self.conrolled:
+            return
         with pynput.mouse.Listener(
                 suppress=True,
                 on_move=self.onMove,

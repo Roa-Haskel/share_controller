@@ -34,6 +34,8 @@ class ScreenManage:
         Returns:
 
         """
+        if str(target) in self.screens:
+            return
         self.screens[str(target)]=(screenSize,(0,0))
         screenkeysSort = sorted(self.screens.keys())
         for screenKey, index in zip(screenkeysSort, range(len(self.screens))):
