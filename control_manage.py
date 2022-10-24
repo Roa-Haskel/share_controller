@@ -18,7 +18,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         #鼠标事件
         MOUSE_EVENTS=2324
         #屏幕管理器更新事件
-        SCREEN_MANAGER_EVENTS=211
+        SCREEN_UPDATE_EVENTS=211
         #注册屏幕信息事件
         ADD_SCREEN_EVENTS=4324
         #控制器状态变更事件，用于控制是否抑制当前输入，发送到其他屏幕
@@ -32,7 +32,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
         self.clients=RemoveCallbackSet([],13)
-        for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop]:
+        for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop]:
             threading.Thread(target=method).start()
 
     def scanLanLoop(self):
@@ -74,9 +74,9 @@ class ControlManageServer(CommonServer,ScreenManage):
             self.addClient(addr,eval(msg))
         elif msgType == self.MsageType.MOUSE_EVENTS:
             self.mouseEvent(**json.loads(msg))
-        elif msgType == self.MsageType.SCREEN_MANAGER_EVENTS:
-            print("screen manage set------")
-            pass
+        elif msgType == self.MsageType.SCREEN_UPDATE_EVENTS:
+            data=json.loads(msg)
+            self.update(data)
         elif msgType==self.MsageType.KEYBOARD_EVENTS:
             print("keyboard event")
             pass
