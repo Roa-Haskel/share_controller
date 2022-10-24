@@ -139,7 +139,10 @@ class ControlManageServer(CommonServer,ScreenManage):
         except:
             name=key.char
         data={'type':'press','key':name}
-        self.sendMsage(data,self.target,self.MsageType.MOUSE_EVENTS)
+        self.sendMsage(data,self.target,self.MsageType.KEYBOARD_EVENTS)
+        if self.conrolled or not self.clients:
+            self.conrolled=True
+            return False
 
     def onRelease(self,key):
         try:
@@ -148,6 +151,10 @@ class ControlManageServer(CommonServer,ScreenManage):
             name=key.char
         data={'type':"release",'key':name}
         self.sendMsage(data,self.target,self.MsageType.KEYBOARD_EVENTS)
+        if self.conrolled or not self.clients:
+            self.conrolled=True
+            return False
+
     def broadcastEvent(self,data,msgType:int):
         for target in self.clients:
             self.sendMsage(json.dumps(data),target,msgType)
