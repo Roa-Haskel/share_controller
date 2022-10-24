@@ -31,7 +31,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.conrolled=True
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
-        self.clients=RemoveCallbackSet([],13)
+        self.clients=RemoveCallbackSet([],13,removeCallback=lambda x:self.screens.pop(str(x)))
         self.screenInfoSendes=set()
         for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop]:
             threading.Thread(target=method).start()
@@ -112,6 +112,7 @@ class ControlManageServer(CommonServer,ScreenManage):
     def onMove(self,nx,ny):
         x,y=self.mouse.position
         data={'type':'move','params':{'dx':nx-x,'dy':ny-y}}
+        # print(data)
         self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
         if self.conrolled or not self.clients:
             self.conrolled=True
@@ -192,10 +193,10 @@ class ControlManageServer(CommonServer,ScreenManage):
                 on_release=self.onRelease
             )
             mouseListen.start()
-            keyboardListen.start()
+            # keyboardListen.start()
 
             mouseListen.join()
-            keyboardListen.join()
+            # keyboardListen.join()
 
 
 if __name__ == '__main__':
