@@ -15,9 +15,9 @@ class ScreenManage:
                and coordinate[1] > leftTop[1] and coordinate[1] < leftTop[1] + height
 
     def __init__(self,selfAddr:tuple):
-        self.selfAddr=selfAddr
+        self.selfAddr=str(selfAddr)
         win=tkinter.Tk()
-        self.screens={selfAddr:((win.winfo_screenwidth(),win.winfo_screenheight()),(0,0))}
+        self.screens={self.selfAddr:((win.winfo_screenwidth(),win.winfo_screenheight()),(0,0))}
         win.destroy()
         self.screensWidget=None
 
@@ -31,7 +31,7 @@ class ScreenManage:
         Returns:
 
         """
-        self.screens[target]=(screenSize,(0,0))
+        self.screens[str(target)]=(screenSize,(0,0))
         screenkeysSort = sorted(self.screens.keys())
         for screenKey, index in zip(screenkeysSort, range(len(self.screens))):
             if index>0:
@@ -129,6 +129,8 @@ class ScreenManage:
             (wh, topLeft) = self.screens[target]
             newScreens[target] = (wh, (left, top))
         self.update(newScreens)
+    def getScreens(self):
+        return {str(key):value for key,value in self.screens().items()}
 
 if __name__ == '__main__':
     sc = ScreenManage(('1', 1999))

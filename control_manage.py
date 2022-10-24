@@ -146,7 +146,7 @@ class ControlManageServer(CommonServer,ScreenManage):
                     x,y=event.x,event.y
 
                     target,xy=self.coordinateIsInTarget(x,y)
-
+                    self.target=target
                     if target:
                         self.conrolled=False
                         self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
