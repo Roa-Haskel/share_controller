@@ -139,7 +139,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         except:
             name=key.char
         data={'type':'press','key':name}
-        self.sendMsage(data,self.target,self.MsageType.KEYBOARD_EVENTS)
+        self.sendEvent(data,self.MsageType.KEYBOARD_EVENTS)
         if self.conrolled or not self.clients:
             self.conrolled=True
             return False
@@ -150,7 +150,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         except:
             name=key.char
         data={'type':"release",'key':name}
-        self.sendMsage(data,self.target,self.MsageType.KEYBOARD_EVENTS)
+        self.sendEvent(data,self.MsageType.KEYBOARD_EVENTS)
         if self.conrolled or not self.clients:
             self.conrolled=True
             return False
