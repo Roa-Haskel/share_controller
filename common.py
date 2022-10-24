@@ -54,7 +54,6 @@ class RemoveCallbackSet(StagingSet):
         if self.removeCallback:
             threading.Thread(target=self.removeCallback,args=(element,)).start()
 
-
 def methodForLoop(sleep:int=10,rand:int=0):
     def wrapper(func):
         def inner(*args,**kwargs):

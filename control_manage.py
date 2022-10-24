@@ -17,8 +17,10 @@ class ControlManageServer(CommonServer,ScreenManage):
         KEYBOARD_EVENTS=442
         #鼠标事件
         MOUSE_EVENTS=2324
-        #屏幕管理器事件
+        #屏幕管理器更新事件
         SCREEN_MANAGER_EVENTS=211
+        #注册屏幕信息事件
+        ADD_SCREEN_EVENTS=4324
         #控制器状态变更事件，用于控制是否抑制当前输入，发送到其他屏幕
         CONTROL_STATUS_CHANGE=24234
     def __init__(self,port=19999):
@@ -30,7 +32,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
         self.clients=RemoveCallbackSet([],13)
-        for method in [self._eventMainLoop, self._sendHeatBeat, self.scanLanLoop]:
+        for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop]:
             threading.Thread(target=method).start()
 
     def scanLanLoop(self):
@@ -62,10 +64,14 @@ class ControlManageServer(CommonServer,ScreenManage):
             except:
                 pass
     @methodForLoop(0)
-    def _eventMainLoop(self):
+    def _eventLoop(self):
         msgType, msg, addr = self.getMsage()
         if msgType == self.MsageType.HEART_TYPE_LOGO:
             self.clients.add(addr)
+            if addr not in self.screens:
+                self.sendMsage(self.getScreenSize(),addr,self.MsageType.ADD_SCREEN_EVENTS)
+        elif msgType==self.MsageType.ADD_SCREEN_EVENTS:
+            self.addClient(addr,eval(msg))
         elif msgType == self.MsageType.MOUSE_EVENTS:
             self.mouseEvent(**json.loads(msg))
         elif msgType == self.MsageType.SCREEN_MANAGER_EVENTS:
@@ -131,6 +137,8 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.target=target
 
     def mainLoop(self):
+        while not self.clients:
+            time.sleep(3)
         with pynput.mouse.Events() as events:
             for event in events:
                 if isinstance(event,pynput.mouse.Events.Move):
@@ -144,7 +152,6 @@ class ControlManageServer(CommonServer,ScreenManage):
                         self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
                         self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}},self.MsageType.MOUSE_EVENTS)
                         break
-        print('--------------------------')
         with pynput.mouse.Listener(
                 # suppress=True,
                 on_move=self.onMove,
