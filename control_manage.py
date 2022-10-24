@@ -144,7 +144,6 @@ class ControlManageServer(CommonServer,ScreenManage):
                 if isinstance(event,pynput.mouse.Events.Move):
 
                     x,y=event.x,event.y
-
                     target,xy=self.coordinateIsInTarget(x,y)
                     self.target=target
                     if target:
@@ -153,7 +152,7 @@ class ControlManageServer(CommonServer,ScreenManage):
                         self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}},self.MsageType.MOUSE_EVENTS)
                         break
         with pynput.mouse.Listener(
-                # suppress=True,
+                suppress=True,
                 on_move=self.onMove,
                 on_click=self.onClick,
                 on_scroll=self.onScroll) as listener:

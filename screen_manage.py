@@ -10,9 +10,12 @@ class ScreenManage:
         Returns:
             给定坐标是否在屏幕中
         """
-        ((width,height),leftTop)=screen
-        return coordinate[0] > leftTop[0] and coordinate[0] < leftTop[0] + width \
-               and coordinate[1] > leftTop[1] and coordinate[1] < leftTop[1] + height
+        # ((width,height),leftTop)=screen
+        # return coordinate[0] > leftTop[0] and coordinate[0] < leftTop[0] + width \
+        #        and coordinate[1] > leftTop[1] and coordinate[1] < leftTop[1] + height
+        ((w,h),(l,t))=screen
+        x,y=coordinate
+        return x>=l and x<=l+w and y>=t and y<=t+h
 
     def __init__(self,selfAddr:tuple):
         self.selfAddr=str(selfAddr)
@@ -72,7 +75,7 @@ class ScreenManage:
             for target,screen in self.screens.items():
                 if target!=self.selfAddr and self.isInscreen(screen,(x,y)):
                     ((_,_),(left,top))=screen
-                    return target,(x-left,y-top)
+                    return eval(target),(x-left,y-top)
         return None,None
     def getScreenSize(self):
         return self.screens[self.selfAddr][0]
@@ -130,7 +133,7 @@ class ScreenManage:
             newScreens[target] = (wh, (left, top))
         self.update(newScreens)
     def getScreens(self):
-        return {str(key):value for key,value in self.screens().items()}
+        return {str(key):value for key,value in self.screens.items()}
 
 if __name__ == '__main__':
     sc = ScreenManage(('1', 1999))
