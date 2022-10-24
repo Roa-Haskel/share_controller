@@ -105,12 +105,12 @@ class ControlManageServer(CommonServer,ScreenManage):
 
     def sendEvent(self,data:dict,eventType:int):
         self.sendMsage(json.dumps(data),self.target,eventType)
-    def onMove(self,x,y):
-        nx,ny=x-self.dx,y-self.dy
-        self.dx,self.dy=x,y
-        data={'type':'move','params':{'dx':nx,'dy':ny}}
+    def onMove(self,nx,ny):
+        x,y=self.mouse.position
+        data={'type':'move','params':{'dx':nx-x,'dy':ny-y}}
         self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
-        if self.conrolled:
+        if self.conrolled or not self.clients:
+            self.conrolled=True
             return False
     def onClick(self,x, y, button, pressed):
         data={'type':'click','button':str(button).split(".")[-1],'pressed':pressed}

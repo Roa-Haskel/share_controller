@@ -42,6 +42,7 @@ class ScreenManage:
                 # self.screens[screenKey].reLeftTop((lastSc.width+lastSc.leftTop[0],0))
                 screen=self.screens[screenKey]
                 self.screens[screenKey]=(screen[0],(lastSc[0][0]+lastSc[1][0],0))
+        self.update(None)
     def update(self,screens:dict=None):
         """
         根据输入的调整后的屏幕布局，更新当前屏幕管理状态
@@ -72,6 +73,7 @@ class ScreenManage:
             target,(x,y)
         """
         if not self.isInscreen(self.getScreen(),(x,y)):
+            print((x,y),self.getScreen())
             for target,screen in self.screens.items():
                 if target!=self.selfAddr and self.isInscreen(screen,(x,y)):
                     ((_,_),(left,top))=screen
