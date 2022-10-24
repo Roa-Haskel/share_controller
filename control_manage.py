@@ -124,17 +124,29 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
 
     def keyboardEvent(self,**kwargs):
+        try:
+            key=pynput.keyboard.Key[kwargs['key']]
+        except:
+            key=kwargs['key']
         if kwargs['type']=='press':
-            self.keyboard.press(pynput.keyboard.Key[kwargs['key']])
+            self.keyboard.press(key)
         else:
-            self.keyboard.release(pynput.keyboard.Key[kwargs['key']])
+            self.keyboard.release(key)
 
     def onPress(self,key):
-        data={'type':'press','key':key.name}
+        try:
+            name=key.name
+        except:
+            name=key.char
+        data={'type':'press','key':name}
         self.sendMsage(data,self.target,self.MsageType.MOUSE_EVENTS)
 
     def onRelease(self,key):
-        data={'type':"release",'key':key.name}
+        try:
+            name=key.name
+        except:
+            name=key.char
+        data={'type':"release",'key':name}
         self.sendMsage(data,self.target,self.MsageType.KEYBOARD_EVENTS)
     def broadcastEvent(self,data,msgType:int):
         for target in self.clients:
