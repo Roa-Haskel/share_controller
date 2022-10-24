@@ -162,6 +162,9 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.broadcastEvent(self.getScreens(),self.MsageType.SCREEN_UPDATE_EVENTS)
     def setTarget(self,target):
         self.target=target
+    def setting(self):
+        super().setting()
+        self.broadcastScreens()
     @methodForLoop(0)
     def mainLoop(self):
         while not self.clients:

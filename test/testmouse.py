@@ -2,14 +2,15 @@ from pynput import keyboard
 
 def on_press(key):
     try:
-        print('alphanumeric key {0} pressed'.format(
-            key.char))
-    except AttributeError:
-        print('special key {0} pressed'.format(
-            key))
+        name=key.name
+        if not name:
+            name=key.char
+        print("name is "+name)
+    except:
+        print("char is {}".format(key.char))
+        print(key)
+    print('------------------\n')
 def on_release(key):
-    print('{0} released'.format(
-        key))
     if key == keyboard.Key.esc:
         # Stop listeneraa1
         return False
