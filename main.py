@@ -9,8 +9,7 @@ con=ControlManageServer()
 
 def onClick(ico,item):
     con.setting()
-
-    con.sendEvent(con.getScreens(),con.MsageType.SCREEN_UPDATE_EVENTS)
+    con.broadcastScreens()
 
 def close(ico,item):
     ico.stop()

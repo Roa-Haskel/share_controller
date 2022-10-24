@@ -82,8 +82,8 @@ class ControlManageServer(CommonServer,ScreenManage):
             data=json.loads(msg)
             self.update(data)
         elif msgType==self.MsageType.KEYBOARD_EVENTS:
-            print("keyboard event")
-            pass
+            data=json.loads(msg)
+            self.keyboardEvent(**data)
         elif msgType==self.MsageType.CONTROL_STATUS_CHANGE:
             self.conrolled=eval(msg)
         else:
@@ -125,18 +125,22 @@ class ControlManageServer(CommonServer,ScreenManage):
 
     def keyboardEvent(self,**kwargs):
         if kwargs['type']=='press':
-            self.keyboard.press(kwargs['key'])
+            self.keyboard.press(pynput.keyboard.Key[kwargs['key']])
         else:
-            self.keyboard.release(kwargs['key'])
+            self.keyboard.release(pynput.keyboard.Key[kwargs['key']])
 
     def onPress(self,key):
-        data={'type':'press','key':key}
+        data={'type':'press','key':key.name}
         self.sendMsage(data,self.target,self.MsageType.MOUSE_EVENTS)
 
     def onRelease(self,key):
-        data={'type':"release",'key':key}
+        data={'type':"release",'key':key.name}
         self.sendMsage(data,self.target,self.MsageType.KEYBOARD_EVENTS)
-
+    def broadcastEvent(self,data,msgType:int):
+        for target in self.clients:
+            self.sendMsage(json.dumps(data),target,msgType)
+    def broadcastScreens(self):
+        self.broadcastEvent(self.getScreens(),self.MsageType.SCREEN_UPDATE_EVENTS)
     def setTarget(self,target):
         self.target=target
     @methodForLoop(0)
@@ -155,12 +159,21 @@ class ControlManageServer(CommonServer,ScreenManage):
                         self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}},self.MsageType.MOUSE_EVENTS)
                         break
         if not self.conrolled:
-            with pynput.mouse.Listener(
+            mouseListen=pynput.mouse.Listener(
                     suppress=True,
                     on_move=self.onMove,
                     on_click=self.onClick,
-                    on_scroll=self.onScroll) as listener:
-                listener.join()
+                    on_scroll=self.onScroll)
+            keyboardListen=pynput.keyboard.Listener(
+                suppress=True,
+                on_press=self.onPress,
+                on_release=self.onRelease
+            )
+            mouseListen.start()
+            keyboardListen.start()
+
+            mouseListen.join()
+            keyboardListen.join()
 
 
 if __name__ == '__main__':
