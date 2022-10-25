@@ -5,6 +5,7 @@ import time
 from common import RemoveCallbackSet,methodForLoop
 from screen_manage import ScreenManage
 import threading
+import os
 
 
 class ControlManageServer(CommonServer,ScreenManage):
@@ -31,7 +32,7 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.conrolled=True
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
-        self.clients=RemoveCallbackSet([],13,removeCallback=lambda x:self.screens.pop(str(x)))
+        self.clients=RemoveCallbackSet([],13,removeCallback=lambda x:None if str(x) not in self.screens or str(x)==self.selfAddr else self.screens.pop(str(x)))
         for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop]:
             threading.Thread(target=method).start()
 
@@ -191,6 +192,10 @@ class ControlManageServer(CommonServer,ScreenManage):
 
             mouseListen.join()
             keyboardListen.stop()
+    def close(self):
+        super().close()
+        os._exit(0)
+
 
 
 if __name__ == '__main__':

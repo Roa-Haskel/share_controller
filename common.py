@@ -58,7 +58,8 @@ def methodForLoop(sleep:int=10,rand:int=0):
     def wrapper(func):
         def inner(*args,**kwargs):
             while True:
-                func(*args,**kwargs)
+                if not func(*args,**kwargs):
+                    break
                 if sleep:
                     offset = 0 if rand == 0 else random.randint(-rand, rand)
                     time.sleep(max((sleep+offset,0)))
