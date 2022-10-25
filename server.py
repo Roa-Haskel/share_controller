@@ -19,6 +19,8 @@ class AbsServer:
         self.__server.sendto(data,target)
     def recvfrom(self):
         return self.__server.recvfrom(1024)
+    def close(self):
+        self.__server.close()
 
 class CommonServer(AbsServer):
     MSAGE_SEP=bytes(bytearray([i+10 for i in 'common_server_msage_sep'.encode()]))

@@ -141,9 +141,7 @@ class ControlManageServer(CommonServer,ScreenManage):
             name=key.char
         data={'type':'press','key':name}
         self.sendEvent(data,self.MsageType.KEYBOARD_EVENTS)
-        if self.conrolled or not self.clients:
-            self.conrolled=True
-            return False
+
 
     def onRelease(self,key):
         try:
@@ -152,9 +150,7 @@ class ControlManageServer(CommonServer,ScreenManage):
             name=key.char
         data={'type':"release",'key':name}
         self.sendEvent(data,self.MsageType.KEYBOARD_EVENTS)
-        if self.conrolled or not self.clients:
-            self.conrolled=True
-            return False
+
 
     def broadcastEvent(self,data,msgType:int):
         for target in self.clients:
@@ -193,10 +189,10 @@ class ControlManageServer(CommonServer,ScreenManage):
                 on_release=self.onRelease
             )
             mouseListen.start()
-            # keyboardListen.start()
+            keyboardListen.start()
 
             mouseListen.join()
-            # keyboardListen.join()
+            keyboardListen.stop()
 
 
 if __name__ == '__main__':
