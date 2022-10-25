@@ -32,7 +32,6 @@ class ControlManageServer(CommonServer,ScreenManage):
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
         self.clients=RemoveCallbackSet([],13,removeCallback=lambda x:self.screens.pop(str(x)))
-        self.screenInfoSendes=set()
         for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop]:
             threading.Thread(target=method).start()
 
@@ -68,11 +67,10 @@ class ControlManageServer(CommonServer,ScreenManage):
     def _eventLoop(self):
         msgType, msg, addr = self.getMsage()
         if msgType == self.MsageType.HEART_TYPE_LOGO:
-            self.clients.add(addr)
             #如果没有给该客户端发送过屏幕信息，则发送一下
-            if str(addr) not in self.screenInfoSendes:
-                self.sendMsage(self.getScreenSize(),addr,self.MsageType.ADD_SCREEN_EVENTS)
-                self.screenInfoSendes.add(str(addr))
+            if addr not in self.clients:
+                self.sendMsage(self.getScreenSize(), addr, self.MsageType.ADD_SCREEN_EVENTS)
+            self.clients.add(addr)
 
         elif msgType==self.MsageType.ADD_SCREEN_EVENTS:
             self.addClient(addr,eval(msg))
