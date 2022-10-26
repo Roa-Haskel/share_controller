@@ -5,6 +5,7 @@ import threading
 
 class EventServer:
     __MSG_SEP=bytes(bytearray([i+10 for i in 'event_server_msage_sep'.encode()]))
+    __MSG_SEP=b"111111111111111111111111111111111111111111111111111111111"
     def __init__(self,port=20000):
         self.__port=port
         self.__client=None
@@ -18,7 +19,6 @@ class EventServer:
         self.__client=socket.socket()
         self.__client.connect(addr)
     def sendEvent(self, data: dict):
-        print(dict)
         self.__client.send(json.dumps(data).encode()+self.__MSG_SEP)
 
     def recvLoop(self):
