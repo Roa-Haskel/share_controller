@@ -6,9 +6,11 @@ from common import RemoveCallbackSet,methodForLoop
 from screen_manage import ScreenManage
 import threading
 import os
+import socket
+from event_server import EventServer
 
 
-class ControlManageServer(CommonServer,ScreenManage):
+class ControlManageServer(CommonServer,ScreenManage,EventServer):
     BUTTONS = {"left": pynput.mouse.Button.left, "right": pynput.mouse.Button.right,
                "middle": pynput.mouse.Button.middle}
     class MsageType:
@@ -24,16 +26,18 @@ class ControlManageServer(CommonServer,ScreenManage):
         ADD_SCREEN_EVENTS=4324
         #控制器状态变更事件，用于控制是否抑制当前输入，发送到其他屏幕
         CONTROL_STATUS_CHANGE=24234
-    def __init__(self,port=19999):
+    def __init__(self,port=19999,tcpPort=20000):
         CommonServer.__init__(self,port)
         ScreenManage.__init__(self,self.getLocalAddr())
+        EventServer.__init__(self,tcpPort)
+        self.__client=None
         self.mouse = pynput.mouse.Controller()
         self.dx,self.dy=self.mouse.position
         self.conrolled=True
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
         self.clients=RemoveCallbackSet([],13,removeCallback=lambda x:None if str(x) not in self.screens or str(x)==self.selfAddr else self.screens.pop(str(x)))
-        for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop]:
+        for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop,self.controllerEventLoop]:
             threading.Thread(target=method).start()
 
     def scanLanLoop(self):
@@ -87,8 +91,15 @@ class ControlManageServer(CommonServer,ScreenManage):
             self.conrolled=eval(msg)
         else:
             print("unknow msage type %s"%msgType)
-
-
+    @methodForLoop(0)
+    def controllerEventLoop(self):
+        event=json.loads(self.msageQueue.get())
+        if event['type'] in ['move','click','button','move_to','scroll']:
+            self.mouseEvent(**event)
+        elif event['type'] in ['release','press']:
+            self.keyboardEvent(**event)
+        else:
+            print("error")
     def mouseEvent(self,**kwargs):
         if kwargs['type']=='move':
             self.mouse.move(**kwargs['params'])
@@ -106,22 +117,22 @@ class ControlManageServer(CommonServer,ScreenManage):
         elif kwargs['type']=='scroll':
             self.mouse.scroll(**kwargs['params'])
 
-    def sendEvent(self,data:dict,eventType:int):
-        self.sendMsage(json.dumps(data),self.target,eventType)
+    def sendEvent(self,data:dict):
+        self.__client.send(json.dumps(data).encode())
     def onMove(self,nx,ny):
         x,y=self.mouse.position
         data={'type':'move','params':{'dx':nx-x,'dy':ny-y}}
         # print(data)
-        self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
+        self.sendEvent(data)
         if self.conrolled or not self.clients:
             self.conrolled=True
             return False
     def onClick(self,x, y, button, pressed):
         data={'type':'click','button':str(button).split(".")[-1],'pressed':pressed}
-        self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
+        self.sendEvent(data)
     def onScroll(self,x,y,dx,dy):
         data={'type':'scroll','params':{'dx':dx*5,'dy':dy*5}}
-        self.sendEvent(data,self.MsageType.MOUSE_EVENTS)
+        self.sendEvent(data)
 
     def keyboardEvent(self,**kwargs):
         try:
@@ -174,7 +185,9 @@ class ControlManageServer(CommonServer,ScreenManage):
                     if target:
                         self.conrolled=False
                         self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
-                        self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}},self.MsageType.MOUSE_EVENTS)
+                        self.__client=socket.socket()
+                        self.__client.connect((target[0],self.getTcpPort()))
+                        self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}})
                         break
         if not self.conrolled:
             mouseListen=pynput.mouse.Listener(
@@ -189,8 +202,8 @@ class ControlManageServer(CommonServer,ScreenManage):
             )
             mouseListen.start()
             keyboardListen.start()
-
             mouseListen.join()
+            self.__client.close()
             keyboardListen.stop()
     def close(self):
         super().close()
