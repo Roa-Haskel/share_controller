@@ -5,7 +5,6 @@ import threading
 
 class EventServer:
     __MSG_SEP=bytes(bytearray([i+10 for i in 'event_server_msage_sep'.encode()]))
-    __MSG_SEP=b"111111111111111111111111111111111111111111111111111111111"
     def __init__(self,port=20000):
         self.__port=port
         self.__client=None
@@ -32,7 +31,7 @@ class EventServer:
                 recv = tcp.recv(1024)
                 if not recv:
                     break
-                messages = (recv+tail).split(self.__MSG_SEP)
+                messages = (tail+recv).split(self.__MSG_SEP)
                 tail = messages[-1]
                 for msg in messages[:-1]:
                     self.msageQueue.put(msg)
