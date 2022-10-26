@@ -14,7 +14,11 @@ class EventServer:
     def getTcpPort(self):
         return self.__port
 
+    def createClient(self,addr):
+        self.__client=socket.socket()
+        self.__client.connect(addr)
     def sendEvent(self, data: dict):
+        print(dict)
         self.__client.send(json.dumps(data).encode()+self.__MSG_SEP)
 
     def recvLoop(self):

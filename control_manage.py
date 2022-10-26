@@ -116,9 +116,6 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
 
         elif kwargs['type']=='scroll':
             self.mouse.scroll(**kwargs['params'])
-
-    def sendEvent(self,data:dict):
-        self.__client.send(json.dumps(data).encode())
     def onMove(self,nx,ny):
         x,y=self.mouse.position
         data={'type':'move','params':{'dx':nx-x,'dy':ny-y}}
@@ -185,8 +182,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
                     if target:
                         self.conrolled=False
                         self.sendMsage(True,self.target,self.MsageType.CONTROL_STATUS_CHANGE)
-                        self.__client=socket.socket()
-                        self.__client.connect((target[0],self.getTcpPort()))
+                        self.createClient((target[0],self.getTcpPort()))
                         self.sendEvent({"type":"move_to","params":{"x":xy[0],'y':xy[1]}})
                         break
         if not self.conrolled:
