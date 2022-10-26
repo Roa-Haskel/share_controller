@@ -5,6 +5,7 @@ import threading
 
 class EventServer:
     __MSG_SEP=bytes(bytearray([i+10 for i in 'event_server_msage_sep'.encode()]))
+
     def __init__(self,port=20000):
         self.__port=port
         self.__client=None
