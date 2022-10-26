@@ -6,8 +6,8 @@ from common import RemoveCallbackSet,methodForLoop
 from screen_manage import ScreenManage
 import threading
 import os
-import socket
 from event_server import EventServer
+import sys
 
 
 class ControlManageServer(CommonServer,ScreenManage,EventServer):
@@ -38,7 +38,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         self.clients=RemoveCallbackSet([],13,removeCallback=lambda x:None if str(x) not in self.screens or str(x)==self.selfAddr else self.screens.pop(str(x)))
         for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop,self.controllerEventLoop]:
             threading.Thread(target=method).start()
-
+        self.suppress=True if sys.platform=='win32' else False
     def scanLanLoop(self):
         ip=self.getLocalAddr()[0]
         splitIp = ip.split(".")
@@ -146,7 +146,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         except:
             name=key.char
         data={'type':'press','key':name}
-        self.sendEvent(data,self.MsageType.KEYBOARD_EVENTS)
+        self.sendEvent(data)
 
 
     def onRelease(self,key):
@@ -155,7 +155,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         except:
             name=key.char
         data={'type':"release",'key':name}
-        self.sendEvent(data,self.MsageType.KEYBOARD_EVENTS)
+        self.sendEvent(data)
 
 
     def broadcastEvent(self,data,msgType:int):
@@ -186,12 +186,12 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
                         break
         if not self.conrolled:
             mouseListen=pynput.mouse.Listener(
-                    suppress=True,
+                    suppress=self.suppress,
                     on_move=self.onMove,
                     on_click=self.onClick,
                     on_scroll=self.onScroll)
             keyboardListen=pynput.keyboard.Listener(
-                suppress=True,
+                suppress=self.suppress,
                 on_press=self.onPress,
                 on_release=self.onRelease
             )
