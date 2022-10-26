@@ -36,7 +36,8 @@ class EventServer:
                 tail = messages[-1]
                 for msg in messages[:-1]:
                     self.msageQueue.put(msg)
-
+    def closeClient(self):
+        self.__client.close()
 
 
 

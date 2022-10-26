@@ -30,7 +30,6 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         CommonServer.__init__(self,port)
         ScreenManage.__init__(self,self.getLocalAddr())
         EventServer.__init__(self,tcpPort)
-        self.__client=None
         self.mouse = pynput.mouse.Controller()
         self.dx,self.dy=self.mouse.position
         self.conrolled=True
@@ -199,7 +198,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
             mouseListen.start()
             keyboardListen.start()
             mouseListen.join()
-            self.__client.close()
+            self.closeClient()
             keyboardListen.stop()
     def close(self):
         super().close()
