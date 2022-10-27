@@ -1,5 +1,8 @@
 from pynput import keyboard
 
+from key_event_factory import KeyEventFactory
+
+
 def on_press(key):
     try:
         print("name:  "+str(key.name))
@@ -14,6 +17,7 @@ def on_press(key):
         print("finally"+str(key)+"\tvk:  "+str(vk)+"\n\n\n")
 
 def on_release(key):
+
     if key == keyboard.Key.esc:
         # Stop listener
         return False

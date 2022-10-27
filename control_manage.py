@@ -132,7 +132,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         self.sendEvent(data)
 
     def keyboardEvent(self,**kwargs):
-        key=kwargs['key']
+        key=self.keyEventFactory.outPut(kwargs['key'])
         if kwargs['type']=='press':
             self.keyboard.press(key)
         else:
