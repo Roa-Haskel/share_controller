@@ -16,10 +16,8 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
     class MsageType:
         #心跳事件
         HEART_TYPE_LOGO = -1111111
-        #键盘事件
-        KEYBOARD_EVENTS=442
-        #鼠标事件
-        MOUSE_EVENTS=2324
+        #剪贴板事件
+        CLIPBOARD_EVENT=432433
         #屏幕管理器更新事件
         SCREEN_UPDATE_EVENTS=211
         #注册屏幕信息事件
@@ -79,14 +77,9 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
 
         elif msgType==self.MsageType.ADD_SCREEN_EVENTS:
             self.addClient(addr,eval(msg))
-        elif msgType == self.MsageType.MOUSE_EVENTS:
-            self.mouseEvent(**json.loads(msg))
         elif msgType == self.MsageType.SCREEN_UPDATE_EVENTS:
             data=json.loads(msg)
             self.update(data)
-        elif msgType==self.MsageType.KEYBOARD_EVENTS:
-            data=json.loads(msg)
-            self.keyboardEvent(**data)
         elif msgType==self.MsageType.CONTROL_STATUS_CHANGE:
             self.conrolled=eval(msg)
         else:
@@ -156,6 +149,14 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
     def setting(self):
         super().setting()
         self.broadcastScreens()
+
+    def hotKeyRegister(self):
+        def on_activate():
+            print("--------------------")
+        hotkeyListen=pynput.keyboard.GlobalHotKeys({
+            "<ctrl>+c" if sys.platform=='win32' else "<cmd>+c":on_activate
+        })
+        hotkeyListen.start()
     @methodForLoop(0)
     def mainLoop(self):
         while not self.clients:
