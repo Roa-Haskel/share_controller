@@ -155,7 +155,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
 
     def hotKeyRegister(self):
         hotkeyListen=pynput.keyboard.GlobalHotKeys({
-            "<ctrl>+c" if sys.platform=='win32' else "<cmd>+c":self.sendMsage(pyperclip.paste(),self.target,self.MsageType.CLIPBOARD_EVENT)
+            "<ctrl>+c" if sys.platform=='win32' else "<cmd>+c":lambda :self.sendMsage(pyperclip.paste(),self.target,self.MsageType.CLIPBOARD_EVENT) if self.target is not None else ''
         })
         hotkeyListen.start()
     @methodForLoop(0)
