@@ -35,7 +35,7 @@ alt_l:cmd
         if 'name' in dir(key):
             if 'shift' in key.name:
                 self.shiftRelease=not self.shiftRelease
-            data=("name",key.name)
+            data=("name",self.keyNames.get(key.name,key.name))
         elif 'char' in dir(key):
             keyChar=key.char
             if not self.shiftRelease:
