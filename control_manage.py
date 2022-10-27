@@ -8,7 +8,7 @@ import threading
 import os
 from event_server import EventServer
 import sys
-
+from key_event_factory import KeyEventFactory
 
 class ControlManageServer(CommonServer,ScreenManage,EventServer):
     BUTTONS = {"left": pynput.mouse.Button.left, "right": pynput.mouse.Button.right,
@@ -39,6 +39,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop,self.controllerEventLoop]:
             threading.Thread(target=method).start()
         self.suppress=True if sys.platform=='win32' else False
+        self.keyEventFactory=KeyEventFactory()
     def scanLanLoop(self):
         ip=self.getLocalAddr()[0]
         splitIp = ip.split(".")
@@ -131,32 +132,19 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         self.sendEvent(data)
 
     def keyboardEvent(self,**kwargs):
-        try:
-            key=pynput.keyboard.Key[kwargs['key']]
-        except:
-            key=kwargs['key']
+        key=kwargs['key']
         if kwargs['type']=='press':
             self.keyboard.press(key)
         else:
             self.keyboard.release(key)
 
     def onPress(self,key):
-        try:
-            name=key.name
-        except:
-            name=key.char
-        data={'type':'press','key':name}
+        data={'type':'press','key':self.keyEventFactory.input(key)}
         self.sendEvent(data)
-
 
     def onRelease(self,key):
-        try:
-            name=key.name
-        except:
-            name=key.char
-        data={'type':"release",'key':name}
+        data={'type':"release",'key':self.keyEventFactory.input(key)}
         self.sendEvent(data)
-
 
     def broadcastEvent(self,data,msgType:int):
         for target in self.clients:

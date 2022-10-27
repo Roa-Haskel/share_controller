@@ -1,4 +1,4 @@
-
+from pynput.keyboard import Key,KeyCode
 
 class KeyEventFactory:
     keyChars="""
@@ -23,8 +23,10 @@ class KeyEventFactory:
 """.strip().split("\n")
 
     keyNames="""
-        
-"""
+cmd:alt
+alt_l:cmd
+""".strip().split(":")
+    keyNames={i[0]:i[1] for i in keyChars}
 
     keyChars={i[0]:i[1] for i in keyChars}
     def __init__(self):
@@ -38,7 +40,19 @@ class KeyEventFactory:
             keyChar=key.char
             if not self.shiftRelease:
                 keyChar=self.keyChars.get(keyChar,keyChar)
-            data=("char",key.char)
+            data=("char",keyChar)
         else:
             data=("vk",key.vk)
+        return data
+    def outPut(self,data):
+        tp,dt=data
+        if tp=="name":
+            key=Key[dt]
+        elif tp=='char':
+            key=tp
+        elif tp=='vk':
+            key=KeyCode.from_vk(dt)
+        else:
+            raise TypeError(str(data))
+        return key
 
