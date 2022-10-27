@@ -19,7 +19,10 @@ class EventServer:
         self.__client=socket.socket()
         self.__client.connect(addr)
     def sendEvent(self, data: dict):
-        self.__client.send(json.dumps(data).encode()+self.__MSG_SEP)
+        try:
+            self.__client.send(json.dumps(data).encode()+self.__MSG_SEP)
+        except Exception as e:
+            print(data)
 
     def recvLoop(self):
         server = socket.socket()

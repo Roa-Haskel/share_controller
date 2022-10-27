@@ -9,6 +9,7 @@ import os
 from event_server import EventServer
 import sys
 from key_event_factory import KeyEventFactory
+import pyperclip
 
 class ControlManageServer(CommonServer,ScreenManage,EventServer):
     BUTTONS = {"left": pynput.mouse.Button.left, "right": pynput.mouse.Button.right,
@@ -38,6 +39,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
             threading.Thread(target=method).start()
         self.suppress=True if sys.platform=='win32' else False
         self.keyEventFactory=KeyEventFactory()
+        self.hotKeyRegister()
     def scanLanLoop(self):
         ip=self.getLocalAddr()[0]
         splitIp = ip.split(".")
@@ -74,7 +76,8 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
             if addr not in self.clients:
                 self.sendMsage(self.getScreenSize(), addr, self.MsageType.ADD_SCREEN_EVENTS)
             self.clients.add(addr)
-
+        elif msgType==self.MsageType.CLIPBOARD_EVENT:
+            pyperclip.copy(msg.decode())
         elif msgType==self.MsageType.ADD_SCREEN_EVENTS:
             self.addClient(addr,eval(msg))
         elif msgType == self.MsageType.SCREEN_UPDATE_EVENTS:
@@ -151,10 +154,8 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         self.broadcastScreens()
 
     def hotKeyRegister(self):
-        def on_activate():
-            print("--------------------")
         hotkeyListen=pynput.keyboard.GlobalHotKeys({
-            "<ctrl>+c" if sys.platform=='win32' else "<cmd>+c":on_activate
+            "<ctrl>+c" if sys.platform=='win32' else "<cmd>+c":self.sendMsage(pyperclip.paste(),self.target,self.MsageType.CLIPBOARD_EVENT)
         })
         hotkeyListen.start()
     @methodForLoop(0)
