@@ -49,7 +49,7 @@ alt_l:cmd
         if tp=="name":
             key=Key[dt]
         elif tp=='char':
-            key=tp
+            key=dt
         elif tp=='vk':
             key=KeyCode.from_vk(dt)
         else:
