@@ -22,7 +22,8 @@ class EventServer:
         try:
             self.__client.send(json.dumps(data).encode()+self.__MSG_SEP)
         except Exception as e:
-            print(data)
+            print(data+"\n\n\n\n")
+            raise e
 
     def recvLoop(self):
         server = socket.socket()
