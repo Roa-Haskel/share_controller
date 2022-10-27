@@ -73,8 +73,8 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         msgType, msg, addr = self.getMsage()
         if msgType == self.MsageType.HEART_TYPE_LOGO:
             #如果没有给该客户端发送过屏幕信息，则发送一下
-            if addr not in self.clients:
-                self.sendMsage(self.getScreenSize(), addr, self.MsageType.ADD_SCREEN_EVENTS)
+            # if addr not in self.clients:
+            self.sendMsage(self.getScreenSize(), addr, self.MsageType.ADD_SCREEN_EVENTS)
             self.clients.add(addr)
         elif msgType==self.MsageType.CLIPBOARD_EVENT:
             pyperclip.copy(msg.decode())
