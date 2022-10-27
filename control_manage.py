@@ -157,8 +157,8 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         #lambda: self.sendMsage(pyperclip.paste(), self.target,
          #                      self.MsageType.CLIPBOARD_EVENT) if self.target is not None else ''
         def func():
+            time.sleep(0.1)
             self.broadcastEvent(pyperclip.paste(),self.MsageType.CLIPBOARD_EVENT)
-            print(pyperclip.paste())
 
         hotkeyListen=pynput.keyboard.GlobalHotKeys({
             "<ctrl>+c" if sys.platform=='win32' else "<cmd>+c":func

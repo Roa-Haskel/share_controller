@@ -38,12 +38,15 @@ class ScreenManage:
             return
         self.screens[str(target)]=(screenSize,(0,0))
         screenkeysSort = sorted(self.screens.keys())
+        maxHeight=max([hegith for (target,((width,hegith),(left,top))) in self.screens.items()])
         for screenKey, index in zip(screenkeysSort, range(len(self.screens))):
             if index>0:
                 lastSc=self.screens[screenkeysSort[index-1]]
-                # self.screens[screenKey].reLeftTop((lastSc.width+lastSc.leftTop[0],0))
                 screen=self.screens[screenKey]
                 self.screens[screenKey]=(screen[0],(lastSc[0][0]+lastSc[1][0],0))
+        #下对齐
+        for (target, ((width, hegith), (left, top))) in self.screens.items():
+            self.screens[target]=((width,hegith),(left,maxHeight-hegith))
         self.update(None)
     def update(self,screens:dict=None):
         """
@@ -54,12 +57,11 @@ class ScreenManage:
         Returns:
 
         """
-        if screens:
+        if screens and len(screens)==len(self.screens):
             self.screens.update(screens)
         #以当前显示器左上角为原点重置所有显示器坐标
         if self.screens[self.selfAddr][1]!=(0,0):
             left,top=self.screens[self.selfAddr][1]
-
             for key,screen in self.screens.items():
                 ((w,h),(l,t))=screen
                 self.screens[key]=((w,h),(l-left,t-top))
