@@ -36,7 +36,7 @@ alt_l:cmd
             if 'shift' in key.name:
                 self.shiftRelease=not self.shiftRelease
             data=("name",self.keyNames.get(key.name,key.name))
-        elif 'char' in dir(key):
+        elif 'char' in dir(key) and key.char is not None:
             keyChar=key.char
             if not self.shiftRelease:
                 keyChar=self.keyChars.get(keyChar,keyChar)

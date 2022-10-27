@@ -1,7 +1,7 @@
 from pynput import keyboard
 
 from key_event_factory import KeyEventFactory
-
+kf=KeyEventFactory()
 
 def on_press(key):
     try:
@@ -17,6 +17,10 @@ def on_press(key):
         print("finally"+str(key)+"\tvk:  "+str(vk)+"\n\n\n")
 
 def on_release(key):
+    print("---------------------------------------")
+    print(kf.input(key))
+    print("-------------------------------")
+
 
     if key == keyboard.Key.esc:
         # Stop listener
