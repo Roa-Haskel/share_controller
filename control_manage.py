@@ -157,7 +157,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         #lambda: self.sendMsage(pyperclip.paste(), self.target,
          #                      self.MsageType.CLIPBOARD_EVENT) if self.target is not None else ''
         def func():
-            self.sendMsage(pyperclip.paste(), self.target,self.MsageType.CLIPBOARD_EVENT)
+            self.broadcastEvent(pyperclip.paste(),self.MsageType.CLIPBOARD_EVENT)
             print(pyperclip.paste())
 
         hotkeyListen=pynput.keyboard.GlobalHotKeys({

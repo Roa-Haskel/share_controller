@@ -55,7 +55,7 @@ class ScreenManage:
 
         """
         if screens:
-            self.screens=screens
+            self.screens.update(screens)
         #以当前显示器左上角为原点重置所有显示器坐标
         if self.screens[self.selfAddr][1]!=(0,0):
             left,top=self.screens[self.selfAddr][1]
