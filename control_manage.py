@@ -113,7 +113,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
                 self.mouse.release(self.BUTTONS[button])
         elif kwargs['type']=='double_click':
             button=kwargs['button']
-            self.mouse.click(button,2)
+            self.mouse.click(self.BUTTONS[button],2)
         elif kwargs['type']=='move_to':
             toX,toY=kwargs['params']['x'],kwargs['params']['y']
             dx,dy=toX-self.mouse.position[0],toY-self.mouse.position[1]
