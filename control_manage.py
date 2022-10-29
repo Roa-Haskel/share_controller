@@ -40,6 +40,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         self.suppress=True if sys.platform=='win32' else False
         self.keyEventFactory=KeyEventFactory()
         self.hotKeyRegister()
+        self.lastPressTime = 0
     def scanLanLoop(self):
         ip=self.getLocalAddr()[0]
         splitIp = ip.split(".")
@@ -90,7 +91,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
     @methodForLoop(0)
     def controllerEventLoop(self):
         event=json.loads(self.msageQueue.get())
-        if event['type'] in ['move','click','button','move_to','scroll']:
+        if event['type'] in ['move','click','button','move_to','scroll','double_click']:
             self.mouseEvent(**event)
         elif event['type'] in ['release','press']:
             self.keyboardEvent(**event)
@@ -110,6 +111,9 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
                 self.mouse.press(self.BUTTONS[button])
             else:
                 self.mouse.release(self.BUTTONS[button])
+        elif kwargs['type']=='double_click':
+            button=kwargs['butto']
+            self.mouse.click(button,2)
         elif kwargs['type']=='move_to':
             toX,toY=kwargs['params']['x'],kwargs['params']['y']
             dx,dy=toX-self.mouse.position[0],toY-self.mouse.position[1]
@@ -127,6 +131,13 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
             return False
     def onClick(self,x, y, button, pressed):
         data={'type':'click','button':str(button).split(".")[-1],'pressed':pressed}
+        if not pressed:
+            if not self.lastPressTime:
+                self.lastPressTime=time.time()
+            else:
+                if self.lastPressTime-time.time()<1:
+                    data={'type':'double_click','button':button}
+                self.lastPressTime=0
         self.sendEvent(data)
     def onScroll(self,x,y,dx,dy):
         data={'type':'scroll','params':{'dx':dx*5,'dy':dy*5}}
