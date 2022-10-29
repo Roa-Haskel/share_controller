@@ -64,7 +64,10 @@ class TcpServer:
 
     def createClient(self,addr):
         self.__client=socket.socket()
-        self.__client.connect(addr)
+        try:
+            self.__client.connect(addr)
+        except:
+            self.__client=None
     def sendEvent(self, data: dict):
         try:
             self.__client.send(json.dumps(data).encode()+self.__MSG_SEP)

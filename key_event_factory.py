@@ -32,9 +32,9 @@ alt_l:cmd
         tp,dt=data
         if tp=="name":
             name=self.keyNames.get(dt,dt)
-            if name in dir(Key):
+            try:
                 key=Key[name]
-            else:
+            except:
                 key=None
         elif tp=='char':
             key=dt
