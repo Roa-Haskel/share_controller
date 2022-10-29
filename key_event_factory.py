@@ -2,36 +2,17 @@ from pynput.keyboard import Key,KeyCode
 import pynput
 import sys
 import time
-
+keyChars = r"1!2@3#4$5%6^7&8*9(0)-_=+[{]}\|/?,<.>".strip()
+_keyChars = {keyChars[i]: keyChars[i + 1] for i in range(0, len(keyChars), 2)}
 class KeyEventFactory:
-    keyChars="""
-1!
-2@
-3#
-4$
-5%
-6^
-7&
-8*
-9(
-0)
--_
-=+
-[{
-]}
-\|
-/?
-,<
-.>
-""".strip().split("\n")
-
+    keyChars=_keyChars
     keyNames="""
 cmd:alt
 alt_l:cmd
 """.strip().split("\n")
     keyNames={i.split(":")[0]:i.split(":")[1] for i in keyNames}
 
-    keyChars={i[0]:i[1] for i in keyChars}
+    # keyChars={i[0]:i[1] for i in keyChars}
     def __init__(self):
         self.shiftRelease=True
     def input(self,key):
@@ -112,3 +93,5 @@ class MouseEventFactory:
     def onScroll(self,x,y,dx,dy):
         data={'type':'scroll','params':{'dx':dx*5,'dy':dy*5}}
         self.sendEvent(data)
+if __name__ == '__main__':
+    pass
