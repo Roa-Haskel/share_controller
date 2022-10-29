@@ -35,12 +35,15 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         self.keyboard = pynput.keyboard.Controller()
         self.target = None
         self.clients=RemoveCallbackSet([],13,removeCallback=lambda x:None if str(x) not in self.screens or str(x)==self.selfAddr else self.screens.pop(str(x)))
-        for method in [self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop,self.controllerEventLoop]:
-            threading.Thread(target=method).start()
         self.suppress=True if sys.platform=='win32' else False
         self.keyEventFactory=KeyEventFactory()
         self.hotKeyRegister()
         self.lastPressTime = 0
+
+        self.threads=[self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop,self.controllerEventLoop]
+        for method in self.threads:
+            threading.Thread(target=method).start()
+
     def scanLanLoop(self):
         ip=self.getLocalAddr()[0]
         splitIp = ip.split(".")
