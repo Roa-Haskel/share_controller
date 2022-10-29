@@ -15,7 +15,36 @@ class ScreenManage:
         #        and coordinate[1] > leftTop[1] and coordinate[1] < leftTop[1] + height
         ((w,h),(l,t))=screen
         x,y=coordinate
-        return x>=l-3 and x<=l+w+3 and y>=t-3 and y<=t+h+3
+        return x>=l and x<=l+w and y>=t and y<=t+h
+    @classmethod
+    def correctMove(cls,position:tuple,move:tuple,wh:tuple):
+        """
+        如果移动位置超出了屏幕，返回修正后的移动坐标，否则返回原来的
+        Args:
+            position: 当前鼠标位置
+            move: 要移动的坐标
+            wh: 屏幕的宽高
+
+        Returns:
+            移动坐标
+        """
+        px,py=position
+        mx,my=move
+        w,h=wh
+
+        if px+mx<0:
+            fx=-px
+        elif px+mx>w:
+            fx=w-px
+        else:
+            fx=mx
+        if py+my<0:
+            fy=-py
+        elif py+my>h:
+            fy=h-py
+        else:
+            fy=my
+        return fx,fy
 
     def __init__(self,selfAddr:tuple):
         self.selfAddr=str(selfAddr)

@@ -98,7 +98,12 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
             print("error")
     def mouseEvent(self,**kwargs):
         if kwargs['type']=='move':
-            self.mouse.move(**kwargs['params'])
+            if sys.platform=='darwin':
+                mx,my=kwargs['params']['dx'],kwargs['params']['dy']
+                fx,fy=self.correctMove(self.mouse.position,(mx,my),self.getScreenSize())
+                self.mouse.move(fx,fy)
+            else:
+                self.mouse.move(**kwargs['params'])
         elif kwargs['type']=='click':
             button=kwargs['button']
             if kwargs['pressed']:
@@ -158,6 +163,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
          #                      self.MsageType.CLIPBOARD_EVENT) if self.target is not None else ''
         def func():
             time.sleep(0.1)
+            print("----------xxxxxx")
             self.broadcastEvent(pyperclip.paste(),self.MsageType.CLIPBOARD_EVENT)
 
         hotkeyListen=pynput.keyboard.GlobalHotKeys({
