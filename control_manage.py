@@ -41,8 +41,9 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         self.lastPressTime = 0
 
         self.threads=[self._eventLoop, self._sendHeatBeat, self.scanLanLoop,self.mainLoop,self.controllerEventLoop]
-        for method in self.threads:
-            threading.Thread(target=method).start()
+        self.threads=[threading.Thread(target=i) for i in self.threads]
+        for i in self.threads:
+            i.start()
 
     def scanLanLoop(self):
         ip=self.getLocalAddr()[0]
