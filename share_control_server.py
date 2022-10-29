@@ -1,4 +1,4 @@
-from server import CommonServer
+from server import CommonUdpServer,TcpServer
 import json
 import pynput
 import time
@@ -6,12 +6,11 @@ from common import RemoveCallbackSet,methodForLoop
 from screen_manage import ScreenManage
 import threading
 import os
-from event_server import EventServer
 import sys
 from key_event_factory import KeyEventFactory
 import pyperclip
 
-class ControlManageServer(CommonServer,ScreenManage,EventServer):
+class ShareControlServer(CommonUdpServer, ScreenManage, TcpServer):
     BUTTONS = {"left": pynput.mouse.Button.left, "right": pynput.mouse.Button.right,
                "middle": pynput.mouse.Button.middle}
     class MsageType:
@@ -26,9 +25,9 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         #控制器状态变更事件，用于控制是否抑制当前输入，发送到其他屏幕
         CONTROL_STATUS_CHANGE=24234
     def __init__(self,port=19999,tcpPort=20000):
-        CommonServer.__init__(self,port)
+        CommonUdpServer.__init__(self, port)
         ScreenManage.__init__(self,self.getLocalAddr())
-        EventServer.__init__(self,tcpPort)
+        TcpServer.__init__(self, tcpPort)
         self.mouse = pynput.mouse.Controller()
         self.dx,self.dy=self.mouse.position
         self.conrolled=True
@@ -130,7 +129,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         data={'type':'move','params':{'dx':nx-x,'dy':ny-y}}
         # print(data)
         self.sendEvent(data)
-        if self.conrolled or not self.clients:
+        if self.conrolled or not self.clients or not self.connectedServer():
             self.conrolled=True
             return False
     def onClick(self,x, y, button, pressed):
@@ -147,6 +146,8 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
 
     def keyboardEvent(self,**kwargs):
         key=self.keyEventFactory.outPut(kwargs['key'])
+        if not key:
+            return
         if kwargs['type']=='press':
             self.keyboard.press(key)
         else:
@@ -176,7 +177,6 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
          #                      self.MsageType.CLIPBOARD_EVENT) if self.target is not None else ''
         def func():
             time.sleep(0.1)
-            print("----------xxxxxx")
             self.broadcastEvent(pyperclip.paste(),self.MsageType.CLIPBOARD_EVENT)
 
         hotkeyListen=pynput.keyboard.GlobalHotKeys({
@@ -222,6 +222,6 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
 
 
 if __name__ == '__main__':
-    con=ControlManageServer()
+    con=ShareControlServer()
     con.mainLoop()
 

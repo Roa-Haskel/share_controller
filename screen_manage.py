@@ -158,7 +158,7 @@ class ScreenManage:
     def resetScrensAndUpdate(self,event):
         if not self.screensWidget:
             return
-        #TODO 还需要一个松开鼠标自动调整位置的功能
+        #TODO 还需要一个松开鼠标自动调整位置,使得窗口贴合的功能
 
         newScreens = dict()
         for target,screen in self.screensWidget.items():

@@ -1,8 +1,8 @@
-from server import CommonServer
+from server import CommonUdpServer
 import pynput
 import time
 
-con=CommonServer()
+con=CommonUdpServer()
 
 mouse = pynput.mouse.Controller()
 while True:

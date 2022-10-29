@@ -1,10 +1,10 @@
 import pystray
 from PIL import Image
-from control_manage import ControlManageServer
+from share_control_server import ShareControlServer
 import sys
 
 if __name__ == '__main__':
-    con = ControlManageServer()
+    con = ShareControlServer()
     if sys.platform=='win32':
         image=Image.open('resources/icon/img.png')
         def onClick(ico,item):
@@ -22,6 +22,5 @@ if __name__ == '__main__':
     elif sys.platform=='darwin':
         for i in con.threads:
             i.join()
-
 
 

@@ -38,7 +38,7 @@ alt_l:cmd
         if 'name' in dir(key):
             if 'shift' in key.name:
                 self.shiftRelease=not self.shiftRelease
-            data=("name",self.keyNames.get(key.name,key.name))
+            data=("name",key.name)
         elif 'char' in dir(key) and key.char is not None:
             keyChar=key.char
             if not self.shiftRelease:
@@ -50,7 +50,11 @@ alt_l:cmd
     def outPut(self,data):
         tp,dt=data
         if tp=="name":
-            key=Key[dt]
+            name=self.keyNames.get(tp,tp)
+            if name in dir(Key):
+                key=Key[dt]
+            else:
+                key=None
         elif tp=='char':
             key=dt
         elif tp=='vk':
