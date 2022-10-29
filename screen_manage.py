@@ -66,7 +66,7 @@ class ScreenManage:
         if str(target) in self.screens:
             return
         self.screens[str(target)]=(screenSize,(0,0))
-        screenkeysSort = sorted(self.screens.keys())
+        screenkeysSort = sorted(self.screens.keys(),reverse=True)
         maxHeight=max([hegith for (target,((width,hegith),(left,top))) in self.screens.items()])
         for screenKey, index in zip(screenkeysSort, range(len(self.screens))):
             if index>0:

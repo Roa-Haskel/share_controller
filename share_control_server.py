@@ -102,6 +102,7 @@ class ShareControlServer(CommonUdpServer, ScreenManage, TcpServer):
             print("error")
     def mouseEvent(self,**kwargs):
         if kwargs['type']=='move':
+            #mac上如果鼠标移动超出屏幕范围会出问题，因此需要修正
             if sys.platform=='darwin':
                 mx,my=kwargs['params']['dx'],kwargs['params']['dy']
                 fx,fy=self.correctMove(self.mouse.position,(mx,my),self.getScreenSize())
