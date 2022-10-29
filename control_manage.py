@@ -112,7 +112,7 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
             else:
                 self.mouse.release(self.BUTTONS[button])
         elif kwargs['type']=='double_click':
-            button=kwargs['butto']
+            button=kwargs['button']
             self.mouse.click(button,2)
         elif kwargs['type']=='move_to':
             toX,toY=kwargs['params']['x'],kwargs['params']['y']
@@ -130,7 +130,8 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
             self.conrolled=True
             return False
     def onClick(self,x, y, button, pressed):
-        data={'type':'click','button':str(button).split(".")[-1],'pressed':pressed}
+        button = str(button).split(".")[-1]
+        data={'type':'click','button':button,'pressed':pressed}
         if not pressed:
             if not self.lastPressTime:
                 self.lastPressTime=time.time()
