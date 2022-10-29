@@ -50,7 +50,7 @@ alt_l:cmd
     def outPut(self,data):
         tp,dt=data
         if tp=="name":
-            name=self.keyNames.get(tp,tp)
+            name=self.keyNames.get(dt,dt)
             if name in dir(Key):
                 key=Key[dt]
             else:
