@@ -106,7 +106,7 @@ class ScreenManage:
             target,(x,y)
         """
         if not self.isInscreen(self.getScreen(),(x,y)):
-            x=x+8 if x<1 else x+8
+            x=x+10 if x<1 else x+10
             for target,screen in self.screens.items():
                 if target!=self.selfAddr and self.isInscreen(screen,(x,y)):
                     ((_,_),(left,top))=screen

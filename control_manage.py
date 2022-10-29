@@ -133,12 +133,9 @@ class ControlManageServer(CommonServer,ScreenManage,EventServer):
         button = str(button).split(".")[-1]
         data={'type':'click','button':button,'pressed':pressed}
         if not pressed:
-            if not self.lastPressTime:
-                self.lastPressTime=time.time()
-            else:
-                if self.lastPressTime-time.time()<1:
-                    data={'type':'double_click','button':button}
-                self.lastPressTime=0
+            if time.time()-self.lastPressTime<0.6:
+                data = {'type': 'double_click', 'button': button}
+            self.lastPressTime=time.time()
         self.sendEvent(data)
     def onScroll(self,x,y,dx,dy):
         data={'type':'scroll','params':{'dx':dx*5,'dy':dy*5}}
