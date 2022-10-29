@@ -15,7 +15,7 @@ class ScreenManage:
         #        and coordinate[1] > leftTop[1] and coordinate[1] < leftTop[1] + height
         ((w,h),(l,t))=screen
         x,y=coordinate
-        return x>=l and x<=l+w and y>=t and y<=t+h
+        return x>l and x<l+w and y>=t and y<=t+h
     @classmethod
     def correctMove(cls,position:tuple,move:tuple,wh:tuple):
         """
