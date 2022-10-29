@@ -52,7 +52,7 @@ alt_l:cmd
         if tp=="name":
             name=self.keyNames.get(dt,dt)
             if name in dir(Key):
-                key=Key[dt]
+                key=Key[name]
             else:
                 key=None
         elif tp=='char':
