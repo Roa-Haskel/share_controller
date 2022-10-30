@@ -1,6 +1,9 @@
 import tkinter
+import os
+import json
 
 class ScreenManage:
+    __CONFIG="config.txt"
     @staticmethod
     def isInscreen(screen:tuple,coordinate):
         """
@@ -53,6 +56,12 @@ class ScreenManage:
         win.destroy()
         self.screensWidget=None
 
+        if os.path.exists(self.__CONFIG):
+            with open(self.__CONFIG) as f:
+                self.configScreens=json.loads(f)
+        else:
+            self.configScreens=dict()
+
     def addClient(self,target:tuple,screenSize:tuple):
         """
         根据客户端地址，屏幕尺寸添加客户端
@@ -65,17 +74,21 @@ class ScreenManage:
         """
         if str(target) in self.screens:
             return
-        self.screens[str(target)]=(screenSize,(0,0))
-        screenkeysSort = sorted(self.screens.keys(),reverse=True)
-        maxHeight=max([hegith for (target,((width,hegith),(left,top))) in self.screens.items()])
-        for screenKey, index in zip(screenkeysSort, range(len(self.screens))):
-            if index>0:
-                lastSc=self.screens[screenkeysSort[index-1]]
-                screen=self.screens[screenKey]
-                self.screens[screenKey]=(screen[0],(lastSc[0][0]+lastSc[1][0],0))
-        #下对齐
-        for (target, ((width, hegith), (left, top))) in self.screens.items():
-            self.screens[target]=((width,hegith),(left,maxHeight-hegith))
+        #如果配置文件中有该ip，从配置文件读取屏幕位置信息，否则自动排列
+        if str(target) in self.configScreens:
+            self.screens[str(target)]=(screenSize,self.configScreens[str(target)][1])
+        else:
+            self.screens[str(target)]=(screenSize,(0,0))
+            screenkeysSort = sorted(self.screens.keys(),reverse=True)
+            maxHeight=max([hegith for (target,((width,hegith),(left,top))) in self.screens.items()])
+            for screenKey, index in zip(screenkeysSort, range(len(self.screens))):
+                if index>0:
+                    lastSc=self.screens[screenkeysSort[index-1]]
+                    screen=self.screens[screenKey]
+                    self.screens[screenKey]=(screen[0],(lastSc[0][0]+lastSc[1][0],0))
+            #下对齐
+            for (target, ((width, hegith), (left, top))) in self.screens.items():
+                self.screens[target]=((width,hegith),(left,maxHeight-hegith))
         self.update(None)
     def update(self,screens:dict=None):
         """
@@ -166,6 +179,11 @@ class ScreenManage:
             left, top = int(info['x']) * 10, int(info['y']) * 10
             (wh, topLeft) = self.screens[target]
             newScreens[target] = (wh, (left, top))
+
+        #更新完屏幕信息后，先写入配置文件
+        with open(self.__CONFIG) as f:
+            f.write(json.dumps(newScreens))
+        #
         self.update(newScreens)
     def getScreens(self):
         return {str(key):value for key,value in self.screens.items()}
