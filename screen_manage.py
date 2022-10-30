@@ -75,8 +75,9 @@ class ScreenManage:
         if str(target) in self.screens:
             return
         #如果配置文件中有该ip，从配置文件读取屏幕位置信息，否则自动排列
-        if str(target) in self.configScreens:
+        if str(target) in self.configScreens and self.selfAddr in self.configScreens:
             self.screens[str(target)]=(screenSize,self.configScreens[str(target)][1])
+            self.screens[self.selfAddr]=(self.getScreenSize(),self.configScreens[self.selfAddr][1])
         else:
             self.screens[str(target)]=(screenSize,(0,0))
             screenkeysSort = sorted(self.screens.keys(),reverse=True)
@@ -160,7 +161,7 @@ class ScreenManage:
             ((width,height),(left,top))=screen
             width,height=int(width/10),int(height/10)
             left,top=int((left+minX)/10),int((top+minY)/10)
-            canvas=tkinter.Canvas(win,width=width,height=height,bg='red')
+            canvas=tkinter.Canvas(win,width=width,height=height,bg='blue',bd=0)
             canvas.place(x=left,y=top)
             canvas.bind("<Button-1>",mousedown)
             canvas.bind("<B1-Motion>",drag)
