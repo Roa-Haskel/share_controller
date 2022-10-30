@@ -101,6 +101,7 @@ class ScreenManage:
         """
         if screens and len(screens)==len(self.screens):
             self.screens.update(screens)
+            self.writeScreenConfig(screens)
         #以当前显示器左上角为原点重置所有显示器坐标
         if self.screens[self.selfAddr][1]!=(0,0):
             left,top=self.screens[self.selfAddr][1]
@@ -179,12 +180,10 @@ class ScreenManage:
             left, top = int(info['x']) * 10, int(info['y']) * 10
             (wh, topLeft) = self.screens[target]
             newScreens[target] = (wh, (left, top))
-
-        #更新完屏幕信息后，先写入配置文件
-        with open(self.__CONFIG,'w') as f:
-            f.write(json.dumps(newScreens))
-        #
         self.update(newScreens)
+    def writeScreenConfig(self,screens):
+        with open(self.__CONFIG,'w') as f:
+            f.write(json.dumps(screens))
     def getScreens(self):
         return {str(key):value for key,value in self.screens.items()}
 
