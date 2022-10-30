@@ -58,7 +58,7 @@ class ScreenManage:
 
         if os.path.exists(self.__CONFIG):
             with open(self.__CONFIG) as f:
-                self.configScreens=json.loads(f)
+                self.configScreens=json.loads(f.read())
         else:
             self.configScreens=dict()
 
@@ -181,7 +181,7 @@ class ScreenManage:
             newScreens[target] = (wh, (left, top))
 
         #更新完屏幕信息后，先写入配置文件
-        with open(self.__CONFIG) as f:
+        with open(self.__CONFIG,'w') as f:
             f.write(json.dumps(newScreens))
         #
         self.update(newScreens)
