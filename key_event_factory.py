@@ -1,7 +1,5 @@
 from pynput.keyboard import Key,KeyCode
-import pynput
 import sys
-import time
 keyChars = r"1!2@3#4$5%6^7&8*9(0)-_=+[{]}\|/?,<.>".strip()
 _keyChars = {keyChars[i]: keyChars[i + 1] for i in range(0, len(keyChars), 2)}
 class KeyEventFactory:
@@ -47,56 +45,5 @@ alt_l:cmd
             raise TypeError(str(data))
         return key
 
-class MouseEventFactory:
-    def __init__(self):
-        self.mouse=pynput.mouse.Controller()
-        self.lastPressTime=0
-    def mouseEventExec(self,**kwargs):
-        if kwargs['type']=='move':
-            if sys.platform=='darwin':
-                mx,my=kwargs['params']['dx'],kwargs['params']['dy']
-                fx,fy=self.correctMove(self.mouse.position,(mx,my),self.getScreenSize())
-                self.mouse.move(fx,fy)
-            else:
-                self.mouse.move(**kwargs['params'])
-        elif kwargs['type']=='click':
-            button=kwargs['button']
-            if kwargs['pressed']:
-                self.mouse.press(self.BUTTONS[button])
-            else:
-                self.mouse.release(self.BUTTONS[button])
-        elif kwargs['type']=='move_to':
-            toX,toY=kwargs['params']['x'],kwargs['params']['y']
-            dx,dy=toX-self.mouse.position[0],toY-self.mouse.position[1]
-            self.mouse.move(dx,dy)
-
-        elif kwargs['type']=='scroll':
-            self.mouse.scroll(**kwargs['params'])
-    def onMove(self,nx,ny):
-        x,y=self.mouse.position
-        data={'type':'move','params':{'dx':nx-x,'dy':ny-y}}
-        self.lastPressTime=0
-        # print(data)
-        self.sendEvent(data)
-        if self.conrolled or not self.clients:
-            self.conrolled=True
-            return False
-    def onClick(self,x, y, button, pressed):
-        button=str(button).split(".")[-1]
-        data={'type':'click','button':str(button).split(".")[-1],'pressed':pressed}
-        if not pressed:
-            if not self.lastPressTime:
-                self.lastPressTime=time.time()
-            else:
-                if time.time()-self.lastPressTime<1:
-                    print("double ssssssssss")
-                    data={'type':'double_click','button':button}
-                self.lastPressTime=0
-
-
-        self.sendEvent(data)
-    def onScroll(self,x,y,dx,dy):
-        data={'type':'scroll','params':{'dx':dx*5,'dy':dy*5}}
-        self.sendEvent(data)
 if __name__ == '__main__':
     pass

@@ -3,6 +3,8 @@ import threading
 import queue
 import json
 
+#定义基本的tcp和udp服务器
+
 class AbsUdpServer:
     def __init__(self,port=19999):
         self._port=port

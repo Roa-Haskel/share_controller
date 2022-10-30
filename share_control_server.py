@@ -25,6 +25,12 @@ class ShareControlServer(CommonUdpServer, ScreenManage, TcpServer):
         #控制器状态变更事件，用于控制是否抑制当前输入，发送到其他屏幕
         CONTROL_STATUS_CHANGE=24234
     def __init__(self,port=19999,tcpPort=20000):
+        """
+        控制器共享管理器集成类
+        Args:
+            port: udp 端口号
+            tcpPort: tcp 端口号
+        """
         CommonUdpServer.__init__(self, port)
         ScreenManage.__init__(self,self.getLocalAddr())
         TcpServer.__init__(self, tcpPort)
