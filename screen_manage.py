@@ -139,6 +139,7 @@ class ScreenManage:
         """
         win=tkinter.Tk()
         win.geometry("640x480+100+100")
+        win['bg']='black'
 
         screens=[(k,v) for k,v in self.screens.items()]
         minX=abs(min(min([i[1][0] for _,i in screens]),0))

@@ -105,7 +105,10 @@ class TcpServer:
         return self.__client is not None
 
     def close(self):
-        self.__client.close()
+        try:
+            self.__client.close()
+        except:
+            pass
         self.activate=False
 
 
