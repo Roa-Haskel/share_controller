@@ -217,9 +217,9 @@ class ShareControlServer(CommonUdpServer, ScreenManage, TcpServer):
             self.closeClient()
             keyboardListen.stop()
     def close(self):
-        super().close()
+        CommonUdpServer.close(self)
+        TcpServer.close(self)
         os._exit(0)
-
 
 
 if __name__ == '__main__':

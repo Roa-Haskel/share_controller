@@ -59,6 +59,7 @@ class TcpServer:
         self.conrolled=True
         self.msageQueue=queue.Queue(100)
         threading.Thread(target=self.recvLoop).start()
+        self.activate=True
     def getTcpPort(self):
         return self.__port
 
@@ -84,7 +85,7 @@ class TcpServer:
         server = socket.socket()
         server.bind(("0.0.0.0", self.__port))
         server.listen(1)
-        while True:
+        while self.activate:
             tcp, addr = server.accept()
             tail=b''
             while True:
@@ -95,7 +96,7 @@ class TcpServer:
                 tail = messages[-1]
                 for msg in messages[:-1]:
                     self.msageQueue.put(msg)
-
+        server.close()
     def closeClient(self):
         if self.__client:
             self.__client.close()
@@ -103,6 +104,9 @@ class TcpServer:
     def connectedServer(self):
         return self.__client is not None
 
+    def close(self):
+        self.__client.close()
+        self.activate=False
 
 
 

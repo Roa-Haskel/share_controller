@@ -12,6 +12,7 @@ if __name__ == '__main__':
             con.broadcastScreens()
 
         def close(ico,item):
+            con.close()
             ico.stop()
 
         icon=pystray.Icon(

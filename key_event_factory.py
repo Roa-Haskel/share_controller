@@ -31,7 +31,10 @@ alt_l:cmd
     def outPut(self,data):
         tp,dt=data
         if tp=="name":
-            name=self.keyNames.get(dt,dt)
+            if sys.platform == 'darwin':
+                name=self.keyNames.get(dt,dt)
+            else:
+                name=dt
             try:
                 key=Key[name]
             except:
@@ -72,6 +75,7 @@ class MouseEventFactory:
     def onMove(self,nx,ny):
         x,y=self.mouse.position
         data={'type':'move','params':{'dx':nx-x,'dy':ny-y}}
+        self.lastPressTime=0
         # print(data)
         self.sendEvent(data)
         if self.conrolled or not self.clients:
@@ -84,7 +88,8 @@ class MouseEventFactory:
             if not self.lastPressTime:
                 self.lastPressTime=time.time()
             else:
-                if self.lastPressTime-time.time()<1:
+                if time.time()-self.lastPressTime<1:
+                    print("double ssssssssss")
                     data={'type':'double_click','button':button}
                 self.lastPressTime=0
 
